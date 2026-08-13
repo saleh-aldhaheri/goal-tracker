@@ -27,3 +27,9 @@ Route::middleware('auth')->group(function () {
     Route::post('goals/{goal}/activities', [GoalActivityController::class, 'store'])->name('goals.activities.store');
     Route::delete('goals/{goal}/activities/{activity}', [GoalActivityController::class, 'destroy'])->name('goals.activities.destroy');
 });
+
+Route::middleware('auth')->group(function () {
+    Route::get('settings/tokens', [\App\Http\Controllers\ApiTokenController::class, 'index'])->name('settings.tokens');
+    Route::post('settings/tokens', [\App\Http\Controllers\ApiTokenController::class, 'store'])->name('settings.tokens.store');
+    Route::delete('settings/tokens/{tokenId}', [\App\Http\Controllers\ApiTokenController::class, 'destroy'])->name('settings.tokens.destroy');
+});
