@@ -6,6 +6,9 @@ on:
   pull_request:
     branches: [main]
 
+permissions:
+  contents: write
+
 jobs:
   test:
     runs-on: ubuntu-latest
@@ -48,4 +51,33 @@ jobs:
         run: npm run build
 
       - name: Run tests
-        run: php artisan test
+        id: run_tests
+        run: php artisan test 2>&1 | tee test-output.txt
+        continue-on-error: true
+
+      - name: Report failure as a commit comment
+        if: steps.run_tests.outcome == 'failure'
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          REPO: ${{ github.repository }}
+          SHA: ${{ github.sha }}
+        run: |
+          python3 - <<'PYEOF'
+          import json, os, urllib.request
+
+          with open('test-output.txt', 'r', errors='replace') as f:
+              output = f.read()[-60000:]
+
+          payload = json.dumps({'body': '### CI test output\n\n```\n' + output + '\n```'}).encode()
+          url = f"https://api.github.com/repos/{os.environ['REPO']}/commits/{os.environ['SHA']}/comments"
+          req = urllib.request.Request(url, data=payload, method='POST', headers={
+              'Authorization': f"token {os.environ['GH_TOKEN']}",
+              'Accept': 'application/vnd.github+json',
+              'Content-Type': 'application/json',
+          })
+          urllib.request.urlopen(req)
+          PYEOF
+
+      - name: Fail job if tests failed
+        if: steps.run_tests.outcome == 'failure'
+        run: exit 1
