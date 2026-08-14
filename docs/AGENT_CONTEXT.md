@@ -55,7 +55,7 @@ per tool (`goals:read`, `goals:write`, `activities:read`,
 `activities:write`, `dashboard:read`). If a real MCP package becomes the
 obvious standard later, wrap this controller rather than rewrite it.
 
-## What's built and pushed (commits `f5c3c2a`..`661ef54`)
+## What's built and pushed (commits `f5c3c2a`..`66b272c`)
 
 - Laravel skeleton, config, auth (register/login/logout, policies)
 - Goal/Topic/Milestone/Activity CRUD, web UI, progress + streak calc
@@ -65,53 +65,39 @@ obvious standard later, wrap this controller rather than rewrite it.
 - MCP tool endpoint, all 23 tools from the original spec section 38
 - API/MCP token issuance UI at `/settings/tokens` (Sanctum abilities,
   revocable, plaintext shown once)
+- Self-service password change at `/settings/password`
+- Question-coverage tracking as an optional per-goal metric
+  (`target_unit === 'questions'`, summed from `question_review` activities)
 - `DemoSeeder` — generic placeholder demo data, NOT Saleh's real data
-- Tests: auth, goal management, tracking, unit progress-calc, API, MCP
-- GitHub Actions CI (`.github/workflows/tests.yml`) — genuinely green,
-  verified via polling the Actions API and reading a real failure once
-  (see "Debugging notes" below)
-- README with install/API/MCP docs
+- `InitialAccountSeeder` — Saleh's real 5 goals, run explicitly, never
+  fabricates progress/history (see full description below)
+- Tests: auth, goal management, tracking, unit progress-calc, API, MCP,
+  question coverage, password change, initial-account seeder — all
+  genuinely passing (verified via a real CI failure readout, not assumed)
+- GitHub Actions CI (`.github/workflows/tests.yml`) — verified green
+- README with install/API/MCP/seeding docs
+- **`Dockerfile`** — authored directly by the repo owner (not this agent)
+  while this session was in progress; PHP 8.3-fpm base, builds via
+  Composer + npm, runs `php artisan migrate --force` then
+  `php artisan serve` on port 8080. Not yet wired to any hosting platform.
+- A defensive extra `sessions` table migration
+  (`0001_01_01_000004_create_sessions_table.php`, guarded with
+  `Schema::hasTable()`) was added by the repo owner independently — it's
+  redundant with the sessions table already created in
+  `0001_01_01_000000_create_users_table.php`, but harmless (no-ops if the
+  table exists). Left as-is rather than removed, to avoid fighting the
+  owner's own commits.
 
-## In flight — written locally, NOT yet committed/pushed as of last check
+**Note on `composer.lock`:** deliberately *not* committed (gitignored).
+The repo owner committed a real one directly via GitHub at one point, but
+it was generated against an older `composer.json` (pre-Laravel-13 bump)
+and broke `composer install` in CI once merged. It was removed again. If
+you regenerate one from a real `composer install` against the *current*
+`composer.json`, committing it is fine and generally good practice — just
+make sure it's actually in sync first (`composer validate` or a clean
+`composer install --no-interaction` with no lock-mismatch warnings).
 
-Triggered by the "initial user context" brief (Saleh's real goals, no fake
-progress, question-coverage tracking, secure initial credentials). Files
-touched:
-
-- `app/Enums/ActivityType.php` — added `QuestionReview` case
-- `app/Services/DashboardService.php` — `goalDashboard()` now adds
-  `questions_total`/`questions_completed` when a goal has
-  `target_unit === 'questions'` (summed from `question_review` activities,
-  clamped to target). Optional metric — absent when not applicable.
-- `resources/views/goals/show.blade.php` — renders question-coverage bar
-  when present; quick-log form gained a generic numeric `value` field
-  (needed to actually log question counts, not just minutes)
-- `app/Http/Controllers/PasswordController.php` (new) + 
-  `resources/views/settings/password.blade.php` (new) +
-  routes in `routes/goals.php` — self-service password change. Added
-  because the seeder must never hardcode a plaintext prod password; this
-  gives a real way to change it after first login.
-- `resources/views/components/layouts/app.blade.php` — nav link to Settings
-- `resources/views/settings/tokens.blade.php` — cross-link to password page
-- `database/seeders/InitialAccountSeeder.php` (new) — **Saleh's real seed
-  data**, separate from `DemoSeeder`, NOT wired into `DatabaseSeeder`
-  (must be run explicitly: `php artisan db:seed --class=InitialAccountSeeder`)
-  so it never fires in CI/tests or silently re-seeds on redeploy. Reads
-  `INITIAL_USER_EMAIL` / `INITIAL_USER_NAME` / `INITIAL_USER_PASSWORD` from
-  env; if no password given, generates a random one and prints it once via
-  `$this->command->warn()`. Uses `updateOrCreate` throughout — idempotent,
-  safe to re-run, never duplicates goals/topics.
-- Tests: `tests/Feature/InitialAccountSeederTest.php`,
-  `tests/Feature/QuestionCoverageTest.php`,
-  `tests/Feature/PasswordChangeTest.php`
-
-**Next step for whoever picks this up:** run the test suite, commit these
-in 2–3 logical groups (e.g. `feat: add question coverage tracking`,
-`feat: add self-service password change`, `feat: add Saleh's initial
-account seeder`), push, and verify CI is still green before considering
-this phase done.
-
-### Saleh's real seed data (from the initial-user-context brief — exact)
+## Debugging notes (useful if CI breaks again)
 
 Five goals, **all starting at 0% progress, 0 activities, no fabricated
 history**:
@@ -176,6 +162,10 @@ Real bugs this caught, for reference:
 - `Goal` model had no in-memory `status`/`priority` default, so a
   freshly-created (not re-fetched) instance had `null` enums and crashed
   `GoalResource` — fixed via `protected $attributes = [...]` on the model
+- `StreakService::completionRate()` called `Carbon::toDateImmutable()`,
+  which doesn't exist (real method is `toImmutable()`) — only triggered
+  when a goal has no `start_date`, which is exactly Saleh's Gym/recurring
+  goals, so it would have broken in production on day one if untested
 
 ## Explicitly out of scope / not done
 

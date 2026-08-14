@@ -205,6 +205,29 @@ Back up `database/database.sqlite` directly (e.g. `cp` it somewhere, or
 consistent snapshot while the app is running). Never expose this file
 publicly — keep it outside `public/`.
 
+## Seeding the real account
+
+`DatabaseSeeder` (via `php artisan migrate --seed`) only creates generic demo
+data — it never touches real personal data. To seed Saleh's actual account
+and goals, set `INITIAL_USER_EMAIL` (and optionally `INITIAL_USER_NAME` /
+`INITIAL_USER_PASSWORD`) in `.env`, then run it explicitly:
+
+```bash
+php artisan db:seed --class=InitialAccountSeeder
+```
+
+If no password is set in `.env`, one is generated and printed once in the
+seeder's output — log in and change it immediately at
+**Settings → Change password**. The seeder is idempotent (safe to re-run;
+it won't duplicate goals or topics) and never fabricates activity history —
+every seeded goal starts at 0% progress with zero logged activity, matching
+the "commitment recorded, progress not yet made" philosophy behind this app.
+
+## Repo notes for future contributors
+
+See `docs/AGENT_CONTEXT.md` for the fuller build history, architecture
+rationale, and what's still open — useful before making non-trivial changes.
+
 ## Troubleshooting
 
 - **"could not find driver" on migrate** — install/enable `pdo_sqlite`.
