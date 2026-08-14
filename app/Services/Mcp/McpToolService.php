@@ -32,34 +32,223 @@ class McpToolService
     ) {
     }
 
+    /** Full tool metadata: name => [description, properties, required, ability]. */
+    public static function tools(): array
+    {
+        $goalId = ['type' => 'integer', 'description' => 'The goal ID'];
+
+        return [
+            'list_goals' => [
+                'ability' => 'goals:read',
+                'description' => 'List your goals, optionally filtered by status and type.',
+                'properties' => [
+                    'status' => ['type' => 'string', 'description' => 'Filter by status: active, completed, paused, archived'],
+                    'type' => ['type' => 'string', 'description' => 'Filter by type: study, project, habit, recurring, fitness, custom'],
+                ],
+                'required' => [],
+            ],
+            'get_goal' => [
+                'ability' => 'goals:read',
+                'description' => 'Get a single goal with its topics and milestones.',
+                'properties' => ['goal_id' => $goalId],
+                'required' => ['goal_id'],
+            ],
+            'create_goal' => [
+                'ability' => 'goals:write',
+                'description' => 'Create a new goal.',
+                'properties' => [
+                    'name' => ['type' => 'string', 'description' => 'Goal name'],
+                    'type' => ['type' => 'string', 'description' => 'Goal type: study, project, habit, recurring, fitness, custom'],
+                    'tracking_mode' => ['type' => 'string', 'description' => 'How progress is measured: topics, milestone, count, time, boolean, habit, recurring, percentage'],
+                    'description' => ['type' => 'string'],
+                    'target_date' => ['type' => 'string', 'description' => 'Target date (YYYY-MM-DD)'],
+                    'target_value' => ['type' => 'number'],
+                    'target_unit' => ['type' => 'string'],
+                    'settings' => ['type' => 'object'],
+                ],
+                'required' => ['name', 'type', 'tracking_mode'],
+            ],
+            'update_goal' => [
+                'ability' => 'goals:write',
+                'description' => 'Update a goal.',
+                'properties' => [
+                    'goal_id' => $goalId,
+                    'name' => ['type' => 'string'],
+                    'description' => ['type' => 'string'],
+                    'target_date' => ['type' => 'string'],
+                    'target_value' => ['type' => 'number'],
+                    'target_unit' => ['type' => 'string'],
+                    'settings' => ['type' => 'object'],
+                ],
+                'required' => ['goal_id'],
+            ],
+            'delete_goal' => [
+                'ability' => 'goals:write',
+                'description' => 'Delete a goal.',
+                'properties' => ['goal_id' => $goalId],
+                'required' => ['goal_id'],
+            ],
+            'pause_goal' => [
+                'ability' => 'goals:write',
+                'description' => 'Pause an active goal.',
+                'properties' => ['goal_id' => $goalId],
+                'required' => ['goal_id'],
+            ],
+            'resume_goal' => [
+                'ability' => 'goals:write',
+                'description' => 'Resume a paused goal.',
+                'properties' => ['goal_id' => $goalId],
+                'required' => ['goal_id'],
+            ],
+            'complete_goal' => [
+                'ability' => 'goals:write',
+                'description' => 'Mark a goal complete.',
+                'properties' => ['goal_id' => $goalId],
+                'required' => ['goal_id'],
+            ],
+            'list_goal_topics' => [
+                'ability' => 'goals:read',
+                'description' => 'List the topics of a goal.',
+                'properties' => ['goal_id' => $goalId],
+                'required' => ['goal_id'],
+            ],
+            'create_goal_topic' => [
+                'ability' => 'goals:write',
+                'description' => 'Add a topic to a goal.',
+                'properties' => [
+                    'goal_id' => $goalId,
+                    'name' => ['type' => 'string', 'description' => 'Topic name'],
+                    'target_value' => ['type' => 'number'],
+                ],
+                'required' => ['goal_id', 'name'],
+            ],
+            'update_goal_topic' => [
+                'ability' => 'goals:write',
+                'description' => 'Update a topic.',
+                'properties' => [
+                    'goal_id' => $goalId,
+                    'topic_id' => ['type' => 'integer', 'description' => 'The topic ID'],
+                    'name' => ['type' => 'string'],
+                    'completed_value' => ['type' => 'number'],
+                ],
+                'required' => ['goal_id', 'topic_id'],
+            ],
+            'complete_goal_topic' => [
+                'ability' => 'goals:write',
+                'description' => 'Mark a topic complete.',
+                'properties' => ['goal_id' => $goalId, 'topic_id' => ['type' => 'integer', 'description' => 'The topic ID']],
+                'required' => ['goal_id', 'topic_id'],
+            ],
+            'list_goal_milestones' => [
+                'ability' => 'goals:read',
+                'description' => 'List the milestones of a goal.',
+                'properties' => ['goal_id' => $goalId],
+                'required' => ['goal_id'],
+            ],
+            'create_goal_milestone' => [
+                'ability' => 'goals:write',
+                'description' => 'Add a milestone to a goal.',
+                'properties' => [
+                    'goal_id' => $goalId,
+                    'name' => ['type' => 'string', 'description' => 'Milestone name'],
+                    'due_date' => ['type' => 'string'],
+                ],
+                'required' => ['goal_id', 'name'],
+            ],
+            'update_goal_milestone' => [
+                'ability' => 'goals:write',
+                'description' => 'Update a milestone.',
+                'properties' => [
+                    'goal_id' => $goalId,
+                    'milestone_id' => ['type' => 'integer', 'description' => 'The milestone ID'],
+                    'name' => ['type' => 'string'],
+                    'progress' => ['type' => 'integer', 'description' => 'Progress 0-100'],
+                    'due_date' => ['type' => 'string'],
+                ],
+                'required' => ['goal_id', 'milestone_id'],
+            ],
+            'complete_goal_milestone' => [
+                'ability' => 'goals:write',
+                'description' => 'Mark a milestone complete.',
+                'properties' => ['goal_id' => $goalId, 'milestone_id' => ['type' => 'integer', 'description' => 'The milestone ID']],
+                'required' => ['goal_id', 'milestone_id'],
+            ],
+            'log_goal_activity' => [
+                'ability' => 'activities:write',
+                'description' => 'Log an activity/session against a goal (time, completion, note).',
+                'properties' => [
+                    'goal_id' => $goalId,
+                    'type' => ['type' => 'string', 'description' => 'Activity type, e.g. study_session, workout, recurring_completion, note'],
+                    'topic_id' => ['type' => 'integer'],
+                    'value' => ['type' => 'number'],
+                    'duration_minutes' => ['type' => 'integer', 'description' => 'Minutes spent'],
+                    'title' => ['type' => 'string'],
+                    'description' => ['type' => 'string'],
+                    'occurred_at' => ['type' => 'string', 'description' => 'When it happened (date)'],
+                ],
+                'required' => ['goal_id', 'type'],
+            ],
+            'get_goal_activity' => [
+                'ability' => 'activities:read',
+                'description' => 'List recent activity for a goal.',
+                'properties' => ['goal_id' => $goalId, 'limit' => ['type' => 'integer', 'description' => 'Max entries (default 20)']],
+                'required' => ['goal_id'],
+            ],
+            'get_goal_progress' => [
+                'ability' => 'dashboard:read',
+                'description' => 'Get a goal\'s current progress percentage.',
+                'properties' => ['goal_id' => $goalId],
+                'required' => ['goal_id'],
+            ],
+            'get_goal_statistics' => [
+                'ability' => 'dashboard:read',
+                'description' => 'Full statistics for a goal (topics, time, sessions, streak).',
+                'properties' => ['goal_id' => $goalId],
+                'required' => ['goal_id'],
+            ],
+            'get_dashboard' => [
+                'ability' => 'dashboard:read',
+                'description' => 'Overall dashboard summary across all goals.',
+                'properties' => [],
+                'required' => [],
+            ],
+            'get_time_summary' => [
+                'ability' => 'dashboard:read',
+                'description' => 'Time spent on a goal: total, this week, this month.',
+                'properties' => ['goal_id' => $goalId],
+                'required' => ['goal_id'],
+            ],
+            'get_streak' => [
+                'ability' => 'dashboard:read',
+                'description' => 'Current and longest streak, and completion rate for a goal.',
+                'properties' => ['goal_id' => $goalId],
+                'required' => ['goal_id'],
+            ],
+        ];
+    }
+
+    /** MCP tools/list schema (name, description, inputSchema). */
+    public static function schema(): array
+    {
+        return array_map(
+            fn ($name, $meta) => [
+                'name' => $name,
+                'description' => $meta['description'],
+                'inputSchema' => [
+                    'type' => 'object',
+                    'properties' => $meta['properties'],
+                    'required' => $meta['required'],
+                ],
+            ],
+            array_keys(self::tools()),
+            self::tools()
+        );
+    }
+
     /** Tool name => required Sanctum token ability. */
     public static function abilities(): array
     {
-        return [
-            'list_goals' => 'goals:read',
-            'get_goal' => 'goals:read',
-            'create_goal' => 'goals:write',
-            'update_goal' => 'goals:write',
-            'delete_goal' => 'goals:write',
-            'pause_goal' => 'goals:write',
-            'resume_goal' => 'goals:write',
-            'complete_goal' => 'goals:write',
-            'list_goal_topics' => 'goals:read',
-            'create_goal_topic' => 'goals:write',
-            'update_goal_topic' => 'goals:write',
-            'complete_goal_topic' => 'goals:write',
-            'list_goal_milestones' => 'goals:read',
-            'create_goal_milestone' => 'goals:write',
-            'update_goal_milestone' => 'goals:write',
-            'complete_goal_milestone' => 'goals:write',
-            'log_goal_activity' => 'activities:write',
-            'get_goal_activity' => 'activities:read',
-            'get_goal_progress' => 'dashboard:read',
-            'get_goal_statistics' => 'dashboard:read',
-            'get_dashboard' => 'dashboard:read',
-            'get_time_summary' => 'dashboard:read',
-            'get_streak' => 'dashboard:read',
-        ];
+        return array_map(fn ($meta) => $meta['ability'], self::tools());
     }
 
     protected function goal(User $user, array $args): Goal

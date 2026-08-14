@@ -234,30 +234,51 @@ confirms that a goal ID belonging to someone else exists.
 
 ---
 
-## MCP setup
+## MCP (Model Context Protocol)
 
-Rather than depend on a single MCP package, the app exposes a small,
-self-contained MCP-compatible tool-call endpoint that any MCP bridge can
-wrap:
+The app ships a **real MCP server** that runs over stdio, so any MCP client
+(Claude Desktop, Cursor, Zed, …) can connect to it directly. It speaks
+JSON-RPC 2.0 with full tool schemas — `initialize`, `tools/list`, and
+`tools/call`.
+
+### 1. Issue a token
+
+Go to **Settings → API & MCP tokens** and create a token. Give it the
+abilities the AI should have — for a full assistant, select all five:
+`goals:read`, `goals:write`, `activities:read`, `activities:write`,
+`dashboard:read`. A read-only token can read but never modify your goals.
+
+### 2. Connect an MCP client
+
+Register the server with the command:
 
 ```
-GET  /api/mcp/tools                 -> list available tool names
-POST /api/mcp/tools/{tool}          -> invoke a tool, JSON body = arguments
+php /absolute/path/to/artisan mcp:serve
 ```
 
-Example — log 2 hours of Laravel study:
+and set `MCP_TOKEN` to the token you created. Example Claude Desktop config
+(`claude_desktop_config.json`):
 
-```bash
-curl -X POST https://your-app.example/api/mcp/tools/log_goal_activity \
-  -H "Authorization: Bearer <token>" \
-  -H "Content-Type: application/json" \
-  -d '{"goal_id": 1, "type": "study_session", "duration_minutes": 120}'
+```json
+{
+  "mcpServers": {
+    "goal-tracker": {
+      "command": "php",
+      "args": ["/absolute/path/to/goal-tracker/artisan", "mcp:serve"],
+      "env": { "MCP_TOKEN": "your-token-here" }
+    }
+  }
+}
 ```
 
-Every tool call is authenticated by the same Sanctum token and ability checks
-as the REST API, so an AI agent can never see or modify another user's data.
+You can also pass the token directly with `php artisan mcp:serve --token=…`.
 
-### Full tool list (`app/Services/Mcp/McpToolService.php`)
+### Tools
+
+The server exposes **23 tools**, each mapping to a goal, topic, milestone,
+activity, or dashboard operation — authenticated by your token and gated by
+its abilities, so an AI agent can never see or modify another user's data and
+a read-only token can never write.
 
 Read tools: `list_goals`, `get_goal`, `list_goal_topics`,
 `list_goal_milestones`, `get_goal_activity`, `get_goal_progress`,
@@ -270,6 +291,23 @@ Write tools: `create_goal`, `update_goal`, `delete_goal`, `pause_goal`,
 
 The application remains the source of truth throughout; the AI only ever
 acts through these validated, scoped, user-owned operations.
+
+### HTTP fallback
+
+A plain HTTP tool-call endpoint is also available for non-MCP callers (same
+auth and ability checks):
+
+```
+GET  /api/mcp/tools                 -> list available tool names
+POST /api/mcp/tools/{tool}          -> invoke a tool, JSON body = arguments
+```
+
+```bash
+curl -X POST https://your-app.example/api/mcp/tools/log_goal_activity \
+  -H "Authorization: Bearer <token>" \
+  -H "Content-Type: application/json" \
+  -d '{"goal_id": 1, "type": "study_session", "duration_minutes": 120}'
+```
 
 ---
 
@@ -317,9 +355,9 @@ Never expose this file publicly — keep it outside `public/`.
 ## Known limitations
 
 - No live deployment configuration is included yet (see "Deployment").
-- The MCP endpoint is a custom, minimal implementation rather than a
-  published Laravel MCP package integration — functionally equivalent, worth
-  revisiting if a de facto standard package matures.
+- The MCP server is a self-contained stdio implementation of the MCP JSON-RPC
+  protocol (no third-party package); it covers tools only — resources and
+  prompts are not exposed.
 - Notifications are intentionally not built; the schema and services don't
   preclude adding them later.
 - "Needs attention" logic on the dashboard is simple and deterministic — no
