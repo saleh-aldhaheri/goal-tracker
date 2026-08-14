@@ -1,12 +1,13 @@
 <x-layouts.app title="Welcome">
-    <div class="max-w-2xl mx-auto text-center py-24">
-        <h1 class="text-3xl font-semibold text-slate-900">Goal Tracker</h1>
-        <p class="mt-3 text-slate-600">Track study revision, projects, habits, and recurring commitments in one place.</p>
-        <div class="mt-8 flex justify-center gap-3">
+    <div class="welcome">
+        <h1>Goal Tracker</h1>
+        <p>Track study revision, projects, habits, and recurring commitments — all derived from what you actually do.</p>
+        <div style="margin-top:28px;display:flex;gap:10px;justify-content:center">
             @auth
-                <a href="{{ route('dashboard') }}" class="px-4 py-2 rounded-lg bg-slate-900 text-white text-sm font-medium">Go to dashboard</a>
+                <a href="{{ route('dashboard') }}" class="btn primary">Go to dashboard</a>
             @else
-                <a href="{{ route('login') }}" class="px-4 py-2 rounded-lg bg-slate-900 text-white text-sm font-medium">Log in</a>
+                <a href="{{ route('login') }}" class="btn primary">Log in</a>
+                <a href="{{ route('register') }}" class="btn">Register</a>
             @endauth
         </div>
     </div>

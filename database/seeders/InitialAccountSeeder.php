@@ -3,99 +3,93 @@
 namespace Database\Seeders;
 
 use App\Enums\GoalPriority;
+use App\Enums\GoalStatus;
 use App\Enums\GoalType;
 use App\Enums\TrackingMode;
 use App\Models\Goal;
 use App\Models\User;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\Hash;
-use Illuminate\Support\Str;
 
 /**
- * Seeds Saleh's real initial account and goals — not demo data (see
- * DemoSeeder for that). Every goal starts at zero progress, with no
- * fabricated history, per the initial user context brief: the account
- * should represent commitments made, not achievements faked.
+ * Seeds Saleh's personal account and the four commitments he is actually
+ * tracking, with zero fabricated history — everything starts empty/zero.
  *
- * Run explicitly, separately from the default `db:seed` (which only runs
- * DemoSeeder), so this never accidentally runs in CI/testing or overwrites
- * a real account with re-seeded goals on redeploy:
- *
- *     php artisan db:seed --class=InitialAccountSeeder
- *
- * Credentials: never hardcoded. Set INITIAL_USER_EMAIL and, optionally,
- * INITIAL_USER_PASSWORD in .env before running. If no password is given,
- * a random one is generated and printed once — log in and change it
- * immediately at Settings > Change password.
+ * No demo users, no invented targets (the only explicit target is the
+ * weekly family call), and no question bank. Laravel/PHP topics are the
+ * 25 revision areas the user is working through; .NET topics are left
+ * empty for the user to add.
  */
 class InitialAccountSeeder extends Seeder
 {
     public function run(): void
     {
-        $email = env('INITIAL_USER_EMAIL', 'saleh@goal-tracker.local');
-        $name = env('INITIAL_USER_NAME', 'Saleh');
-        $password = env('INITIAL_USER_PASSWORD');
-        $generatedPassword = null;
-
-        if (! $password) {
-            $generatedPassword = Str::password(16);
-            $password = $generatedPassword;
-        }
-
         $user = User::updateOrCreate(
-            ['email' => $email],
-            ['name' => $name, 'password' => Hash::make($password)]
+            ['email' => 'salehaldhaheri09@gmail.com'],
+            [
+                'name' => 'Saleh',
+                'password' => Hash::make(env('INITIAL_USER_PASSWORD', 'password')),
+                'email_verified_at' => now(),
+            ]
         );
-
-        if ($generatedPassword) {
-            $this->command?->warn("Generated password for {$email}: {$generatedPassword}");
-            $this->command?->warn('Log in and change this immediately at Settings > Change password.');
-        }
 
         $this->seedPhpLaravel($user);
         $this->seedDotNet($user);
-        $this->seedProject($user);
         $this->seedGym($user);
         $this->seedFamilyCall($user);
+        $this->seedProjects($user);
     }
 
     protected function seedPhpLaravel(User $user): void
     {
         $goal = Goal::updateOrCreate(
-            ['user_id' => $user->id, 'name' => 'PHP + Laravel Revision'],
+            ['user_id' => $user->id, 'name' => 'Laravel / PHP Revision'],
             [
-                'description' => 'Revising PHP and Laravel for junior developer interviews, backed by an external ~550-question bank.',
+                'description' => 'Revise PHP and Laravel to be interview-ready. Tracks topics covered and study time.',
                 'type' => GoalType::Study,
+                'status' => GoalStatus::Active,
                 'priority' => GoalPriority::High,
                 'tracking_mode' => TrackingMode::Topics,
-                'target_value' => 550,
-                'target_unit' => 'questions',
+                'start_date' => today(),
             ]
         );
 
         if ($goal->topics()->count() === 0) {
-            $this->seedTopics($goal, [
-                'Tier S / Core — PHP' => [
-                    'PHP Fundamentals', 'PHP OOP', 'Modern PHP', 'Composer', 'Exceptions', 'Dependency Injection',
-                ],
-                'Tier S / Core — Laravel' => [
-                    'MVC', 'Routing', 'Controllers', 'Middleware', 'Request Lifecycle',
-                    'Validation / Form Requests', 'Eloquent', 'Eloquent Relationships', 'Migrations',
-                    'Factories / Seeders', 'Query Builder', 'N+1 Query Problem', 'Authentication',
-                    'Authorization', 'Service Container', 'Service Providers', 'Queues / Jobs',
-                ],
-                'Tier S / Core — Database' => [
-                    'SQL', 'JOINs', 'Indexes', 'Foreign Keys', 'Transactions', 'Normalization',
-                ],
-                'Tier A' => [
-                    'Events / Listeners', 'Caching', 'Redis', 'API Resources', 'Testing',
-                    'Filesystem / Storage', 'Blade', 'Policies', 'Sanctum', 'Rate Limiting', 'Performance',
-                ],
-                'Tier B' => [
-                    'Advanced Container Internals', 'Advanced PHP Internals', 'Generators',
-                    'Contextual Binding', 'Advanced Events', 'Advanced Architecture', 'Advanced Distributed Systems',
-                ],
-            ]);
+            $topics = [
+                'PHP Fundamentals',
+                'PHP OOP',
+                'Modern PHP',
+                'Composer',
+                'HTTP / Web Fundamentals',
+                'Laravel Fundamentals',
+                'Request Lifecycle',
+                'Eloquent',
+                'Eloquent Relationships',
+                'Database / Migrations',
+                'Query Builder / SQL',
+                'Validation',
+                'Authentication / Authorization',
+                'Service Container / Dependency Injection',
+                'Events / Listeners',
+                'Queues / Jobs',
+                'Caching',
+                'Files / Storage',
+                'API Development',
+                'Testing',
+                'Security',
+                'Blade / Frontend Basics',
+                'Practical / Scenario Questions',
+                'Interviewer Scenario Questions',
+                'Project Questions',
+            ];
+
+            foreach ($topics as $order => $name) {
+                $goal->topics()->create([
+                    'name' => $name,
+                    'status' => 'pending',
+                    'sort_order' => $order,
+                ]);
+            }
         }
     }
 
@@ -104,49 +98,70 @@ class InitialAccountSeeder extends Seeder
         $goal = Goal::updateOrCreate(
             ['user_id' => $user->id, 'name' => '.NET Revision'],
             [
-                'description' => 'Revising .NET and C#, tracked independently from PHP/Laravel.',
+                'description' => 'Revise and strengthen .NET / C# knowledge. Add your own topics as you study.',
                 'type' => GoalType::Study,
+                'status' => GoalStatus::Active,
                 'priority' => GoalPriority::High,
                 'tracking_mode' => TrackingMode::Topics,
+                'start_date' => today(),
             ]
         );
 
         if ($goal->topics()->count() === 0) {
-            $this->seedTopics($goal, [
-                'Core .NET / C#' => [
-                    'C# Fundamentals', 'Object-Oriented Programming', 'Collections', 'Generics', 'LINQ',
-                    'Async / Await', 'Exceptions', 'Dependency Injection', 'Interfaces', 'Delegates / Events',
-                    'Modern C#', '.NET Fundamentals', 'ASP.NET Core', 'MVC', 'Web API', 'Middleware',
-                    'Routing', 'Model Binding', 'Validation', 'Authentication', 'Authorization',
-                    'Entity Framework Core', 'Database / SQL', 'Migrations', 'Relationships', 'Performance',
-                    'Testing', 'Logging', 'Configuration', 'Caching',
-                ],
-            ]);
-        }
-    }
+            $topics = [
+                'C# Fundamentals',
+                'Object-Oriented Programming',
+                'Collections',
+                'Generics',
+                'LINQ',
+                'Async / Await',
+                'Exceptions',
+                'Dependency Injection',
+                'Interfaces',
+                'Delegates / Events',
+                'Modern C# Features',
+                '.NET Fundamentals',
+                'ASP.NET Core',
+                'MVC',
+                'Web API',
+                'Middleware',
+                'Routing',
+                'Model Binding',
+                'Validation',
+                'Authentication',
+                'Authorization',
+                'Entity Framework Core',
+                'Database / SQL',
+                'Migrations',
+                'Relationships',
+                'Performance',
+                'Testing',
+                'Logging',
+                'Configuration',
+                'Caching',
+            ];
 
-    protected function seedProject(User $user): void
-    {
-        Goal::updateOrCreate(
-            ['user_id' => $user->id, 'name' => 'Goal Tracker'],
-            [
-                'description' => 'Building and deploying this Goal Tracker application itself.',
-                'type' => GoalType::Project,
-                'priority' => GoalPriority::Medium,
-                'tracking_mode' => TrackingMode::Milestone,
-            ]
-        );
+            foreach ($topics as $order => $name) {
+                $goal->topics()->create([
+                    'name' => $name,
+                    'status' => 'pending',
+                    'sort_order' => $order,
+                ]);
+            }
+        }
     }
 
     protected function seedGym(User $user): void
     {
         Goal::updateOrCreate(
-            ['user_id' => $user->id, 'name' => 'Gym'],
+            ['user_id' => $user->id, 'name' => 'Gym / Fitness'],
             [
-                'description' => 'Ongoing recurring habit — frequency is intentionally left open, edit it to your intended schedule.',
+                'description' => 'Recurring workout habit. Frequency is intentionally open — configure it to your schedule.',
                 'type' => GoalType::Fitness,
+                'status' => GoalStatus::Active,
                 'priority' => GoalPriority::Medium,
                 'tracking_mode' => TrackingMode::Habit,
+                'start_date' => today(),
             ]
         );
     }
@@ -154,31 +169,61 @@ class InitialAccountSeeder extends Seeder
     protected function seedFamilyCall(User $user): void
     {
         Goal::updateOrCreate(
-            ['user_id' => $user->id, 'name' => 'Family Call'],
+            ['user_id' => $user->id, 'name' => 'Call Family'],
             [
-                'description' => 'One call per week — an ongoing commitment with no final completion date.',
+                'description' => 'One family call per week — an ongoing recurring commitment.',
                 'type' => GoalType::Recurring,
+                'status' => GoalStatus::Active,
                 'priority' => GoalPriority::Medium,
                 'tracking_mode' => TrackingMode::Recurring,
+                'start_date' => today(),
                 'settings' => ['frequency' => 'weekly', 'target_count' => 1],
             ]
         );
     }
 
-    /** @param array<string, array<int, string>> $tiers */
-    protected function seedTopics(Goal $goal, array $tiers): void
+    protected function seedProjects(User $user): void
     {
-        $order = 0;
+        Goal::updateOrCreate(
+            ['user_id' => $user->id, 'name' => 'Chat App'],
+            [
+                'description' => 'Complete the chat application.',
+                'type' => GoalType::Project,
+                'status' => GoalStatus::Active,
+                'tracking_mode' => TrackingMode::Milestone,
+                'start_date' => today(),
+            ]
+        );
 
-        foreach ($tiers as $tierLabel => $topics) {
-            foreach ($topics as $topic) {
-                $goal->topics()->create([
-                    'name' => $topic,
-                    'description' => $tierLabel,
-                    'status' => 'pending',
-                    'sort_order' => $order++,
-                ]);
-            }
-        }
+        Goal::updateOrCreate(
+            ['user_id' => $user->id, 'name' => 'Portfolio'],
+            [
+                'description' => 'Complete the personal/professional portfolio.',
+                'type' => GoalType::Project,
+                'status' => GoalStatus::Active,
+                'tracking_mode' => TrackingMode::Milestone,
+                'start_date' => today(),
+            ]
+        );
+
+        Goal::updateOrCreate(
+            ['user_id' => $user->id, 'name' => 'App — On Hold #1'],
+            [
+                'description' => 'Complete the application when it is resumed.',
+                'type' => GoalType::Project,
+                'status' => GoalStatus::Paused,
+                'tracking_mode' => TrackingMode::Milestone,
+            ]
+        );
+
+        Goal::updateOrCreate(
+            ['user_id' => $user->id, 'name' => 'App — On Hold #2'],
+            [
+                'description' => 'Complete the application when it is resumed.',
+                'type' => GoalType::Project,
+                'status' => GoalStatus::Paused,
+                'tracking_mode' => TrackingMode::Milestone,
+            ]
+        );
     }
 }

@@ -1,9 +1,11 @@
 <x-layouts.app title="New goal">
-    <h1 class="text-lg font-semibold mb-6">Create a goal</h1>
+    <div class="top">
+        <div><h1>New goal</h1><div class="sub">Define a commitment and how to measure it</div></div>
+    </div>
 
     @if ($errors->any())
-        <div class="mb-4 text-sm text-red-600">
-            <ul class="list-disc list-inside">
+        <div class="errors">
+            <ul>
                 @foreach ($errors->all() as $error)
                     <li>{{ $error }}</li>
                 @endforeach
@@ -11,58 +13,62 @@
         </div>
     @endif
 
-    <form method="POST" action="{{ route('goals.store') }}" class="space-y-4 max-w-xl">
+    <form method="POST" action="{{ route('goals.store') }}" style="max-width:680px">
         @csrf
-        <div>
-            <label class="block text-sm font-medium mb-1">Name</label>
-            <input name="name" value="{{ old('name') }}" required class="w-full rounded-lg border-slate-300 text-sm">
+        <div class="field">
+            <label class="label">Name</label>
+            <input type="text" name="name" value="{{ old('name') }}" required class="input" placeholder="e.g. Laravel / PHP Revision">
         </div>
-        <div>
-            <label class="block text-sm font-medium mb-1">Description</label>
-            <textarea name="description" class="w-full rounded-lg border-slate-300 text-sm">{{ old('description') }}</textarea>
+        <div class="field">
+            <label class="label">Description</label>
+            <textarea name="description" class="textarea" placeholder="Why this goal matters, and what done looks like">{{ old('description') }}</textarea>
         </div>
-        <div class="grid grid-cols-2 gap-4">
-            <div>
-                <label class="block text-sm font-medium mb-1">Type</label>
-                <select name="type" class="w-full rounded-lg border-slate-300 text-sm">
+        <div class="form-grid">
+            <div class="field">
+                <label class="label">Type</label>
+                <select name="type" class="select">
                     @foreach ($types as $type)
-                        <option value="{{ $type->value }}">{{ $type->label() }}</option>
+                        <option value="{{ $type->value }}" @selected(old('type') === $type->value)>{{ $type->label() }}</option>
                     @endforeach
                 </select>
             </div>
-            <div>
-                <label class="block text-sm font-medium mb-1">Tracking mode</label>
-                <select name="tracking_mode" class="w-full rounded-lg border-slate-300 text-sm">
+            <div class="field">
+                <label class="label">Tracking mode</label>
+                <select name="tracking_mode" class="select">
                     @foreach ($trackingModes as $mode)
-                        <option value="{{ $mode->value }}">{{ $mode->label() }}</option>
+                        <option value="{{ $mode->value }}" @selected(old('tracking_mode') === $mode->value)>{{ $mode->label() }}</option>
                     @endforeach
                 </select>
             </div>
         </div>
-        <div class="grid grid-cols-2 gap-4">
-            <div>
-                <label class="block text-sm font-medium mb-1">Priority</label>
-                <select name="priority" class="w-full rounded-lg border-slate-300 text-sm">
+        <div class="form-grid">
+            <div class="field">
+                <label class="label">Priority</label>
+                <select name="priority" class="select">
                     @foreach ($priorities as $priority)
-                        <option value="{{ $priority->value }}">{{ $priority->label() }}</option>
+                        <option value="{{ $priority->value }}" @selected(old('priority') === $priority->value)>{{ $priority->label() }}</option>
                     @endforeach
                 </select>
             </div>
-            <div>
-                <label class="block text-sm font-medium mb-1">Target date</label>
-                <input type="date" name="target_date" value="{{ old('target_date') }}" class="w-full rounded-lg border-slate-300 text-sm">
+            <div class="field">
+                <label class="label">Start date</label>
+                <input type="date" name="start_date" value="{{ old('start_date') }}" class="input">
             </div>
         </div>
-        <div class="grid grid-cols-2 gap-4">
-            <div>
-                <label class="block text-sm font-medium mb-1">Target value <span class="text-slate-400">(optional — count/time goals)</span></label>
-                <input type="number" step="0.01" name="target_value" value="{{ old('target_value') }}" class="w-full rounded-lg border-slate-300 text-sm">
+        <div class="form-grid">
+            <div class="field">
+                <label class="label">Target date</label>
+                <input type="date" name="target_date" value="{{ old('target_date') }}" class="input">
             </div>
-            <div>
-                <label class="block text-sm font-medium mb-1">Target unit</label>
-                <input name="target_unit" value="{{ old('target_unit') }}" placeholder="e.g. minutes, workouts" class="w-full rounded-lg border-slate-300 text-sm">
+            <div class="field">
+                <label class="label">Target value <span style="color:var(--dim2)">(optional)</span></label>
+                <input type="number" step="0.01" name="target_value" value="{{ old('target_value') }}" class="input" placeholder="e.g. 20">
             </div>
         </div>
-        <button class="px-4 py-2 rounded-lg bg-slate-900 text-white text-sm font-medium">Create goal</button>
+        <div class="field">
+            <label class="label">Target unit</label>
+            <input type="text" name="target_unit" value="{{ old('target_unit') }}" class="input" placeholder="e.g. topics, minutes, workouts, questions">
+        </div>
+        <button type="submit" class="btn primary">Create goal</button>
     </form>
 </x-layouts.app>

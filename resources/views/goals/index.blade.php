@@ -1,33 +1,39 @@
 <x-layouts.app title="Goals">
-    <div class="flex items-center justify-between mb-6">
-        <h1 class="text-lg font-semibold">Goals</h1>
-        <a href="{{ route('goals.create') }}" class="px-3 py-1.5 rounded-lg bg-slate-900 text-white text-sm">+ New goal</a>
+    <div class="top">
+        <div><h1>Goals</h1><div class="sub">Everything committed</div></div>
+        <a class="btn primary" href="{{ route('goals.create') }}">+ New goal</a>
     </div>
 
-    <form method="GET" class="flex flex-wrap gap-2 mb-6 text-sm">
-        <input type="text" name="q" value="{{ request('q') }}" placeholder="Search goals..." class="rounded-lg border-slate-300 text-sm">
-        <select name="status" class="rounded-lg border-slate-300 text-sm">
-            <option value="">All statuses</option>
+    <div class="filters">
+        <form method="GET" action="{{ route('goals.index') }}" style="display:contents">
+            <input type="search" name="q" value="{{ request('q') }}" placeholder="SEARCH…">
+            <select name="type" class="select" style="width:auto" onchange="this.form.submit()">
+                <option value="">All types</option>
+                @foreach ($types as $type)
+                    <option value="{{ $type->value }}" @selected(request('type') === $type->value)>{{ $type->label() }}</option>
+                @endforeach
+            </select>
+            <button class="btn small" type="submit">Filter</button>
+        </form>
+        <div class="chips">
+            @php($base = array_filter(['q' => request('q'), 'type' => request('type')]))
+            <a class="chip {{ ! request('status') ? 'on' : '' }}" href="{{ route('goals.index', $base) }}">All</a>
             @foreach ($statuses as $status)
-                <option value="{{ $status->value }}" @selected(request('status') === $status->value)>{{ $status->label() }}</option>
+                <a class="chip {{ request('status') === $status->value ? 'on' : '' }}" href="{{ route('goals.index', $base + ['status' => $status->value]) }}">{{ $status->label() }}</a>
             @endforeach
-        </select>
-        <select name="type" class="rounded-lg border-slate-300 text-sm">
-            <option value="">All types</option>
-            @foreach ($types as $type)
-                <option value="{{ $type->value }}" @selected(request('type') === $type->value)>{{ $type->label() }}</option>
-            @endforeach
-        </select>
-        <button class="px-3 py-1.5 rounded-lg border border-slate-300 text-sm">Filter</button>
-    </form>
+        </div>
+    </div>
 
-    <div class="grid gap-3 md:grid-cols-2">
+    <div class="goalgrid">
         @forelse ($goals as $goal)
             <x-goal-card :goal="$goal" />
         @empty
-            <p class="text-sm text-slate-500">No goals match your filters.</p>
+            <div style="color:var(--dim);grid-column:1/-1;padding:24px 0">
+                No goals match your filters.
+                <a href="{{ route('goals.create') }}" style="color:var(--brass)">Create one</a>.
+            </div>
         @endforelse
     </div>
 
-    <div class="mt-6">{{ $goals->links() }}</div>
+    {{ $goals->links() }}
 </x-layouts.app>

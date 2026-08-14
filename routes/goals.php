@@ -9,6 +9,7 @@ use Illuminate\Support\Facades\Route;
 
 Route::middleware('auth')->group(function () {
     Route::get('/dashboard', DashboardController::class)->name('dashboard');
+    Route::get('/farm', \App\Http\Controllers\FarmController::class)->name('farm');
 
     Route::resource('goals', GoalController::class);
     Route::post('goals/{goal}/pause', [GoalController::class, 'pause'])->name('goals.pause');

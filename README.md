@@ -1,51 +1,76 @@
 # Goal Tracker
 
-A flexible personal goal-tracking system built in Laravel. It supports study
-revision, projects, habits, and recurring commitments through one generic
-goal model — no goal type is hard-coded into the application logic.
+A flexible personal goal-tracking system built with Laravel 13 and SQLite. It
+turns your commitments — study revision, projects, habits, and recurring
+routines — into a calm, living garden you can actually watch grow.
 
-The app does **not** contain a question bank. Study material (e.g. Laravel
-or .NET interview questions) lives externally; this app only tracks your
-progress: topics covered, time spent, sessions, streaks, and milestones.
+The app has two faces that share the same data:
 
-## Features
+1. **The Homestead** — a data-first dashboard (charts, progress bars,
+   statistics) skinned as a quiet farm at night or morning, with a light
+   gamification layer (level, XP, gold, streaks, achievements).
+2. **The Goal Garden** (`/farm`) — a full-screen, animated garden where each
+   goal is a flower that grows with its progress, droops when neglected, and
+   blooms when you finish.
 
-- Generic goals with configurable tracking mode (topics, milestones, count,
-  time, boolean, habit, recurring, or manual percentage)
-- Topics and milestones with derived (not manually typed) progress
-- Activity log as the single source of historical truth — every session,
-  workout, or recurring completion is a permanent record
-- Time tracking stored as integer minutes, formatted for display
-- Habit and recurring-goal streaks calculated from activity history
-- Main dashboard and a per-goal dashboard
-- REST API secured with Laravel Sanctum tokens
-- An MCP-compatible tool-call endpoint so an external AI agent can read and
-  adjust your goals under your own scoped, revocable token
+The app does **not** contain a question bank. Study material (e.g. Laravel or
+.NET interview questions) lives externally; this app only tracks your
+*progress*: topics covered, time spent, sessions, streaks, and milestones.
+
+---
+
+## Highlights
+
+- **Generic goals, nothing hard-coded** — one `Goal` model drives study,
+  project, habit, recurring, fitness, and custom goals via a `tracking_mode`
+  (topics, milestones, count, time, boolean, habit, recurring, percentage).
+- **Data-first** — progress and streaks are always *derived* from the
+  activity log, never a manually edited number.
+- **The Goal Garden** — a living farm with growth-stage flowers, a day/night
+  cycle, weather (rain), a house whose windows glow at night, fireflies,
+  clouds, and wind, plus sad/happy flower moods tied to how recently you
+  worked on each goal.
+- **Gamification** — XP earned from real activity, a level curve, gold
+  (lifetime XP), streak tracking, and unlockable achievements.
+- **Calm theme with dark/light/auto** — a farm-night sky (stars + transparent
+  clouds) in dark mode, a morning sky (wind + pollen) in light mode, with a
+  smooth crossfade and a translucent-glass interface.
+- **Sound** — optional sound effects (on create/log/complete), four
+  generative focus tracks, and ambient rain/wind/crickets, each with its own
+  volume control, persisted per browser.
+- **REST API** secured with scoped Sanctum tokens.
+- **MCP-compatible endpoint** so an external AI agent can read and adjust
+  your goals under your own scoped, revocable token.
+
+---
 
 ## Architecture
 
 ```
-User → Goals → (Topics | Milestones) → Goal Activities → Dashboards
+User → Goals → (Topics | Milestones) → Goal Activities → Dashboards + Farm
 ```
 
-- `App\Models\Goal` — the one goal model for every goal type
-- `App\Enums\{GoalType,GoalStatus,GoalPriority,TrackingMode,ActivityType}` —
-  labels only; nothing in the app branches on `if ($goal->name === 'Gym')`
-- `App\Services\GoalProgressService` — computes 0-100% progress from the
-  goal's `tracking_mode`, always clamped, e.g. topics completed / total
-- `App\Services\StreakService` — current/longest streak and completion rate,
-  derived from `goal_activities`, not cached
-- `App\Services\DashboardService` — main dashboard and per-goal dashboard
-  aggregates, plus simple deterministic "needs attention" rules
-- `App\Services\Mcp\McpToolService` — the 23 MCP tools, called by
-  `McpController`
+| Component | Responsibility |
+|---|---|
+| `App\Models\Goal` | the single goal model for every goal type |
+| `App\Enums\*` (`GoalType`, `GoalStatus`, `GoalPriority`, `TrackingMode`, `ActivityType`) | labels only — no `if ($goal->name === 'Gym')` anywhere |
+| `App\Services\GoalProgressService` | 0–100% progress from `tracking_mode`, always clamped |
+| `App\Services\StreakService` | current/longest streak + completion rate, derived from activities |
+| `App\Services\DashboardService` | main + per-goal dashboards, weekly/monthly time, "needs attention" rules |
+| `App\Services\GamificationService` | XP, level, gold, streak, and achievements from real activity |
+| `App\Http\Controllers\FarmController` | feeds `/farm` with each goal's progress, color, and last-activity age |
+| `App\Services\Mcp\McpToolService` | the MCP tools, called by `McpController` |
+
+---
 
 ## Requirements
 
-- PHP 8.2+
+- PHP 8.3+
 - Composer
 - Node.js 20+ / npm
-- SQLite (bundled with PHP's `pdo_sqlite` extension)
+- SQLite (the `pdo_sqlite` extension, bundled with most PHP installs)
+
+---
 
 ## Installation (local)
 
@@ -62,36 +87,99 @@ npm run build
 php artisan serve
 ```
 
-Visit `http://localhost:8000`. The seeder creates a demo account:
+Visit `http://localhost:8000` and log in. The seeder creates the personal
+account:
 
-- Email: `demo@goal-tracker.test`
+- Email: `salehaldhaheri09@gmail.com`
 - Password: `password`
 
-The demo goals (Laravel/PHP revision, .NET revision, a project, gym, and a
-weekly family call) are clearly-marked seed data — the app also works
-correctly with a completely empty database, and you can delete the demo
-goals from the UI at any time.
+> Change the password after first login (**Settings → Change password**), or
+> set `INITIAL_USER_PASSWORD` in `.env` *before* running the seeder to use a
+> different one.
 
-## Running locally in dev mode
+The seeded account starts with four real commitments — **Laravel / PHP
+Revision**, **.NET Revision**, **Gym / Fitness**, and **Call Family** — plus
+four projects (**Chat App**, **Portfolio**, and two "On Hold" apps). All start
+at **zero progress** with no fabricated history: the point of the app is that
+*your* activity grows the garden from here.
+
+For a quick look at a populated garden, log some activity (or add topics /
+milestones) and the flowers will grow with you.
+
+### Dev mode (hot reload)
 
 ```bash
 php artisan serve      # terminal 1
-npm run dev             # terminal 2, for Tailwind/JS hot reload
+npm run dev            # terminal 2, Vite hot reload
 ```
+
+---
 
 ## SQLite setup
 
 The app uses SQLite exclusively (`config/database.php` defaults to
-`database/database.sqlite`). Make sure the file exists and is writable
-before running migrations:
+`database/database.sqlite`). Make sure the file exists before migrating:
 
 ```bash
 touch database/database.sqlite
 php artisan migrate
 ```
 
-Set a different path with `DB_DATABASE=/absolute/path/to/file.sqlite` in
-`.env`.
+Point at a different file with `DB_DATABASE=/absolute/path/to/file.sqlite`.
+
+---
+
+## The Goal Garden (`/farm`)
+
+Each active goal is a flower that grows in stages (seed → sprout → bud →
+bloom → full bloom) as its progress rises. A flower droops and sheds a tear
+when its goal has been neglected for 5+ days, and bounces cheerfully while
+you're active. Hovering a flower shows its progress, last-activity time, and
+a little nudge of encouragement; clicking it opens the goal.
+
+- **Time** — Auto (follows your clock) / Day / Night.
+- **Weather** — Auto (random showers) / Clear / Rain.
+- **Ambience** — wind in the morning, crickets at night, rain while it rains.
+
+---
+
+## Gamification
+
+XP is earned only from real activity — nothing is stored or manually
+adjustable:
+
+| Action | XP |
+|---|---|
+| 1 minute logged | +1 |
+| Topic completed | +20 |
+| Milestone completed | +50 |
+| Goal completed | +200 |
+| Daily-chore / streak day | +10 |
+
+- **Level** rises on an increasing curve (each level needs a little more XP
+  than the last).
+- **Gold** is just your lifetime XP total — a fun counter, not a second
+  currency.
+- **Streak** is your longest current streak across all goals.
+- **Achievements** unlock automatically: First Step, On Fire (7-day streak),
+  Harvest (5 goals), Scholar (20 topics), Builder (10 milestones), Farmer
+  (level 20).
+
+---
+
+## Sound
+
+A floating 🔊 button (bottom-right) opens the sound panel on every page:
+
+- **Music** — four generative tracks (Calm Day / Focus / Rainy / Night) with
+  a volume slider.
+- **SFX** — a gentle chime on create/log/complete, with a volume slider.
+- **Ambience** — wind / rain / crickets, with a volume slider.
+
+All settings persist in `localStorage`. Audio starts after your first click
+or keypress (browser autoplay rules).
+
+---
 
 ## Running tests
 
@@ -99,8 +187,10 @@ Set a different path with `DB_DATABASE=/absolute/path/to/file.sqlite` in
 php artisan test
 ```
 
-Tests run against an in-memory SQLite database (`phpunit.xml`), so no setup
-is required beyond `composer install`.
+Tests run against an in-memory SQLite database (`phpunit.xml`); no setup is
+needed beyond `composer install`.
+
+---
 
 ## Building frontend assets
 
@@ -108,8 +198,9 @@ is required beyond `composer install`.
 npm run build
 ```
 
-Outputs to `public/build`, referenced via the `@vite` directive in
-`resources/views/components/layouts/app.blade.php`.
+Outputs to `public/build`, referenced via the `@vite` directive.
+
+---
 
 ## API documentation
 
@@ -119,10 +210,10 @@ All endpoints are under `/api` and require a Sanctum bearer token:
 Authorization: Bearer <token>
 ```
 
-Create a token from the UI at **Settings -> API & MCP tokens**, choosing one
-or more abilities: `goals:read`, `goals:write`, `activities:read`,
-`activities:write`, `dashboard:read`. Every route checks the specific
-ability it needs — a read-only token cannot write.
+Create a token from **Settings → API & MCP tokens**, choosing abilities:
+`goals:read`, `goals:write`, `activities:read`, `activities:write`,
+`dashboard:read`. Every route checks the ability it needs — a read-only token
+cannot write.
 
 | Method | Endpoint | Ability |
 |---|---|---|
@@ -141,12 +232,13 @@ ability it needs — a read-only token cannot write.
 A request for another user's goal returns `404`, not `403` — the API never
 confirms that a goal ID belonging to someone else exists.
 
+---
+
 ## MCP setup
 
-There's no single, independently-verifiable "the" Laravel MCP package as of
-this build, so rather than depend on one sight-unseen, the app exposes a
-small, self-contained MCP-compatible tool-call endpoint that any MCP
-bridge/adapter can wrap:
+Rather than depend on a single MCP package, the app exposes a small,
+self-contained MCP-compatible tool-call endpoint that any MCP bridge can
+wrap:
 
 ```
 GET  /api/mcp/tools                 -> list available tool names
@@ -162,89 +254,73 @@ curl -X POST https://your-app.example/api/mcp/tools/log_goal_activity \
   -d '{"goal_id": 1, "type": "study_session", "duration_minutes": 120}'
 ```
 
-Every tool call is authenticated by the same Sanctum token as the REST API
-and checked against the same abilities, so an AI agent can never see or
-modify another user's data, and a read-only token can't call a write tool.
+Every tool call is authenticated by the same Sanctum token and ability checks
+as the REST API, so an AI agent can never see or modify another user's data.
 
 ### Full tool list (`app/Services/Mcp/McpToolService.php`)
 
-Read tools (`goals:read` / `activities:read` / `dashboard:read`):
-`list_goals`, `get_goal`, `list_goal_topics`, `list_goal_milestones`,
-`get_goal_activity`, `get_goal_progress`, `get_goal_statistics`,
-`get_dashboard`, `get_time_summary`, `get_streak`
+Read tools: `list_goals`, `get_goal`, `list_goal_topics`,
+`list_goal_milestones`, `get_goal_activity`, `get_goal_progress`,
+`get_goal_statistics`, `get_dashboard`, `get_time_summary`, `get_streak`
 
-Write tools (`goals:write` / `activities:write`):
-`create_goal`, `update_goal`, `delete_goal`, `pause_goal`, `resume_goal`,
-`complete_goal`, `create_goal_topic`, `update_goal_topic`,
+Write tools: `create_goal`, `update_goal`, `delete_goal`, `pause_goal`,
+`resume_goal`, `complete_goal`, `create_goal_topic`, `update_goal_topic`,
 `complete_goal_topic`, `create_goal_milestone`, `update_goal_milestone`,
 `complete_goal_milestone`, `log_goal_activity`
 
-### Suggested AI workflow (spec section 40)
-
-1. `get_goal` + `get_goal_statistics` to read current state and history
-2. Analyze in the AI's own reasoning — the app does no automatic AI analysis
-3. Propose a change to the person, e.g. a later `target_date`
-4. On confirmation, call `update_goal` to apply it
-
 The application remains the source of truth throughout; the AI only ever
-acts through these same validated, scoped, user-owned operations.
+acts through these validated, scoped, user-owned operations.
+
+---
 
 ## Deployment
 
-Deployment was intentionally left out of this build at the user's request.
-The app is deployment-agnostic: it needs PHP 8.2+, Composer, Node for the
+The app is deployment-agnostic: it needs PHP 8.3+, Composer, Node for the
 asset build, and a writable path for `database/database.sqlite` that
 persists across restarts (a bind-mounted volume, not container-ephemeral
-storage). A `Dockerfile` was not added since no specific platform was
-chosen — see "Known limitations" below.
+storage). Run `npm run build` (or build in CI) before serving.
+
+---
 
 ## Database backup
 
-Back up `database/database.sqlite` directly (e.g. `cp` it somewhere, or
-`sqlite3 database/database.sqlite ".backup backup.sqlite"` for a
-consistent snapshot while the app is running). Never expose this file
-publicly — keep it outside `public/`.
-
-## Seeding the real account
-
-`DatabaseSeeder` (via `php artisan migrate --seed`) only creates generic demo
-data — it never touches real personal data. To seed Saleh's actual account
-and goals, set `INITIAL_USER_EMAIL` (and optionally `INITIAL_USER_NAME` /
-`INITIAL_USER_PASSWORD`) in `.env`, then run it explicitly:
+Back up `database/database.sqlite` directly:
 
 ```bash
-php artisan db:seed --class=InitialAccountSeeder
+cp database/database.sqlite database/database.sqlite.bak
 ```
 
-If no password is set in `.env`, one is generated and printed once in the
-seeder's output — log in and change it immediately at
-**Settings → Change password**. The seeder is idempotent (safe to re-run;
-it won't duplicate goals or topics) and never fabricates activity history —
-every seeded goal starts at 0% progress with zero logged activity, matching
-the "commitment recorded, progress not yet made" philosophy behind this app.
+or, for a consistent snapshot while running:
 
-## Repo notes for future contributors
+```bash
+sqlite3 database/database.sqlite ".backup backup.sqlite"
+```
 
-See `docs/AGENT_CONTEXT.md` for the fuller build history, architecture
-rationale, and what's still open — useful before making non-trivial changes.
+Never expose this file publicly — keep it outside `public/`.
+
+---
 
 ## Troubleshooting
 
 - **"could not find driver" on migrate** — install/enable `pdo_sqlite`.
-- **419 Page Expired on login/forms** — usually a stale session cookie
-  after `APP_KEY` changed; clear cookies or re-run `php artisan key:generate`.
+- **419 Page Expired on login/forms** — stale session cookie after `APP_KEY`
+  changed; clear cookies or re-run `php artisan key:generate`.
 - **Assets not loading (`Vite manifest not found`)** — run `npm run build`,
   or `npm run dev` while developing.
+- **No sound** — click anywhere on the page first (browser autoplay rules),
+  then check the 🔊 panel toggles and volumes.
 - **MCP tool returns 403** — the token is missing the ability that tool
   requires; issue a new token with the right abilities in Settings.
 
+---
+
 ## Known limitations
 
-- No live deployment configuration is included yet (see "Deployment" above).
+- No live deployment configuration is included yet (see "Deployment").
 - The MCP endpoint is a custom, minimal implementation rather than a
-  published Laravel MCP package integration — functionally equivalent, but
-  worth revisiting if a de facto standard package matures.
-- Notifications (spec section 34) are intentionally not built; the schema
-  and services don't preclude adding them later.
-- AI-driven "goals falling behind" recommendations are intentionally not
-  built — dashboard "needs attention" logic is simple and deterministic.
+  published Laravel MCP package integration — functionally equivalent, worth
+  revisiting if a de facto standard package matures.
+- Notifications are intentionally not built; the schema and services don't
+  preclude adding them later.
+- "Needs attention" logic on the dashboard is simple and deterministic — no
+  AI recommendation engine.

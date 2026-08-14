@@ -1,49 +1,55 @@
 <x-layouts.app title="API & MCP tokens">
-    <h1 class="text-lg font-semibold mb-2">API & MCP tokens</h1>
-    <p class="text-sm text-slate-500 mb-6"><a href="{{ route('settings.password') }}" class="underline">Change your password</a></p>
+    <div class="top">
+        <div><h1>Settings</h1><div class="sub">API &amp; MCP access tokens · <a href="{{ route('settings.password') }}" style="color:var(--brass)">change password</a></div></div>
+    </div>
 
     @if (session('plainTextToken'))
-        <div class="mb-6 rounded-lg bg-amber-50 border border-amber-200 p-4 text-sm">
-            <p class="font-medium">Copy your token now — it won't be shown again:</p>
-            <code class="block mt-2 break-all bg-white rounded px-2 py-1">{{ session('plainTextToken') }}</code>
+        <div class="tokenbox">
+            Copy your token now — it won't be shown again:
+            <code>{{ session('plainTextToken') }}</code>
         </div>
     @endif
 
-    <form method="POST" action="{{ route('settings.tokens.store') }}" class="space-y-3 bg-white border border-slate-200 rounded-xl p-4 mb-8 max-w-lg">
-        @csrf
-        <div>
-            <label class="block text-sm font-medium mb-1">Token name</label>
-            <input name="name" required placeholder="e.g. Claude MCP" class="w-full rounded-lg border-slate-300 text-sm">
-        </div>
-        <div>
-            <label class="block text-sm font-medium mb-1">Abilities</label>
-            <div class="grid grid-cols-2 gap-2 text-sm">
-                @foreach ($abilities as $ability)
-                    <label class="flex items-center gap-2">
-                        <input type="checkbox" name="abilities[]" value="{{ $ability }}"> {{ $ability }}
-                    </label>
-                @endforeach
+    <div class="panel">
+        <h2>Create token</h2>
+        <form method="POST" action="{{ route('settings.tokens.store') }}" style="max-width:560px">
+            @csrf
+            <div class="field">
+                <label class="label">Token name</label>
+                <input name="name" required placeholder="e.g. Claude MCP" class="input">
             </div>
-        </div>
-        <button class="px-3 py-1.5 rounded-lg bg-slate-900 text-white text-sm">Create token</button>
-    </form>
-
-    <h2 class="text-sm font-semibold mb-2">Active tokens</h2>
-    <ul class="space-y-2">
-        @forelse ($tokens as $token)
-            <li class="flex items-center justify-between bg-white border border-slate-200 rounded-lg px-4 py-2 text-sm">
-                <div>
-                    <p class="font-medium">{{ $token->name }}</p>
-                    <p class="text-xs text-slate-500">{{ implode(', ', $token->abilities) }} · last used {{ $token->last_used_at?->diffForHumans() ?? 'never' }}</p>
+            <div class="field">
+                <label class="label">Abilities</label>
+                <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px">
+                    @foreach ($abilities as $ability)
+                        <label style="display:flex;align-items:center;gap:8px;font-size:13px;color:var(--chalk)">
+                            <input type="checkbox" name="abilities[]" value="{{ $ability }}" class="input checkbox"> {{ $ability }}
+                        </label>
+                    @endforeach
                 </div>
-                <form method="POST" action="{{ route('settings.tokens.destroy', $token->id) }}" onsubmit="return confirm('Revoke this token?');">
-                    @csrf
-                    @method('DELETE')
-                    <button class="text-xs text-red-600">Revoke</button>
-                </form>
-            </li>
-        @empty
-            <p class="text-sm text-slate-500">No tokens yet.</p>
-        @endforelse
-    </ul>
+            </div>
+            <button class="btn primary">Create token</button>
+        </form>
+    </div>
+
+    <div class="panel">
+        <h2>Active tokens</h2>
+        <div class="list">
+            @forelse ($tokens as $token)
+                <div class="row-item">
+                    <div class="grow">
+                        <div class="t">{{ $token->name }}</div>
+                        <div class="s">{{ implode(', ', $token->abilities) }} · last used {{ $token->last_used_at?->diffForHumans() ?? 'never' }}</div>
+                    </div>
+                    <form method="POST" action="{{ route('settings.tokens.destroy', $token->id) }}" data-confirm="Revoke the token '{{ $token->name }}'?">
+                        @csrf
+                        @method('DELETE')
+                        <button class="btn small danger">Revoke</button>
+                    </form>
+                </div>
+            @empty
+                <div style="color:var(--dim)">No tokens yet.</div>
+            @endforelse
+        </div>
+    </div>
 </x-layouts.app>

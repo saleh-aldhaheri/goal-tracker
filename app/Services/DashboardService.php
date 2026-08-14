@@ -27,12 +27,15 @@ class DashboardService
             'total_active_goals' => $active->count(),
             'goals_completed' => $goals->where('status', GoalStatus::Completed)->count(),
             'overall_progress' => $active->isEmpty() ? 0 : (int) round($active->avg(fn (Goal $g) => $g->progress())),
+            'time_today' => $this->minutesSince($user, today()),
             'time_this_week' => $this->minutesSince($user, now()->startOfWeek()),
             'time_this_month' => $this->minutesSince($user, now()->startOfMonth()),
             'todays_activity' => $user->goals()
                 ->join('goal_activities', 'goals.id', '=', 'goal_activities.goal_id')
                 ->whereDate('goal_activities.occurred_at', today())
                 ->count('goal_activities.id'),
+            'week_daily_minutes' => $this->weekDailyMinutes($user),
+            'time_by_goal' => $this->timeByGoal($active),
             'goals_needing_attention' => $this->goalsNeedingAttention($active),
             'upcoming_deadlines' => $active->filter(fn (Goal $g) => $g->target_date && $g->target_date->isFuture() && $g->target_date->lte(now()->addDays(14)))
                 ->sortBy('target_date')
@@ -47,6 +50,58 @@ class DashboardService
             ->join('goal_activities', 'goals.id', '=', 'goal_activities.goal_id')
             ->where('goal_activities.occurred_at', '>=', $since)
             ->sum('goal_activities.duration_minutes');
+    }
+
+    protected function weekDailyMinutes(User $user): array
+    {
+        $rows = $user->goals()
+            ->join('goal_activities', 'goals.id', '=', 'goal_activities.goal_id')
+            ->where('goal_activities.occurred_at', '>=', now()->startOfWeek())
+            ->selectRaw('DATE(goal_activities.occurred_at) as d, SUM(goal_activities.duration_minutes) as m')
+            ->groupBy('d')
+            ->pluck('m', 'd');
+
+        $days = [];
+        for ($i = 0; $i < 7; $i++) {
+            $date = now()->startOfWeek()->addDays($i);
+            $days[] = [
+                'label' => $date->format('D'),
+                'minutes' => (int) ($rows[$date->toDateString()] ?? 0),
+            ];
+        }
+
+        return $days;
+    }
+
+    protected function timeByGoal($activeGoals): array
+    {
+        $activeGoals->loadSum([
+            'activities as month_minutes' => fn ($q) => $q->where('occurred_at', '>=', now()->startOfMonth()),
+        ], 'duration_minutes');
+
+        return $activeGoals
+            ->map(fn (Goal $g) => ['name' => $g->name, 'minutes' => (int) ($g->month_minutes ?? 0)])
+            ->sortByDesc('minutes')
+            ->take(5)
+            ->values()
+            ->all();
+    }
+
+    protected function dailyMinutes(Goal $goal): array
+    {
+        $rows = $goal->activities()
+            ->where('occurred_at', '>=', now()->subDays(29)->startOfDay())
+            ->selectRaw('DATE(occurred_at) as d, SUM(duration_minutes) as m')
+            ->groupBy('d')
+            ->pluck('m', 'd');
+
+        $daily = [];
+        for ($i = 29; $i >= 0; $i--) {
+            $date = now()->subDays($i);
+            $daily[] = (int) ($rows[$date->toDateString()] ?? 0);
+        }
+
+        return $daily;
     }
 
     /**
@@ -77,6 +132,7 @@ class DashboardService
             'milestones_total' => $goal->milestones()->count(),
             'current_streak' => $this->streaks->currentStreak($goal),
             'longest_streak' => $this->streaks->longestStreak($goal),
+            'daily_minutes_30' => $this->dailyMinutes($goal),
         ];
 
         // Question coverage is an optional secondary metric on top of topic
