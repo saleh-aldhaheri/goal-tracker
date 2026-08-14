@@ -33,3 +33,8 @@ Route::middleware('auth')->group(function () {
     Route::post('settings/tokens', [\App\Http\Controllers\ApiTokenController::class, 'store'])->name('settings.tokens.store');
     Route::delete('settings/tokens/{tokenId}', [\App\Http\Controllers\ApiTokenController::class, 'destroy'])->name('settings.tokens.destroy');
 });
+
+Route::middleware('auth')->group(function () {
+    Route::get('settings/password', [\App\Http\Controllers\PasswordController::class, 'edit'])->name('settings.password');
+    Route::put('settings/password', [\App\Http\Controllers\PasswordController::class, 'update'])->name('settings.password.update');
+});

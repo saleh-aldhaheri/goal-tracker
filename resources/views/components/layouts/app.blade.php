@@ -14,6 +14,7 @@
                     <a href="{{ route('dashboard') }}" class="font-semibold">Goal Tracker</a>
                     <a href="{{ route('dashboard') }}" class="text-sm text-slate-600 hover:text-slate-900">Dashboard</a>
                     <a href="{{ route('goals.index') }}" class="text-sm text-slate-600 hover:text-slate-900">Goals</a>
+                    <a href="{{ route('settings.tokens') }}" class="text-sm text-slate-600 hover:text-slate-900">Settings</a>
                 </div>
                 <form method="POST" action="{{ route('logout') }}">
                     @csrf

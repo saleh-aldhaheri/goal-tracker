@@ -1,5 +1,6 @@
 <x-layouts.app title="API & MCP tokens">
-    <h1 class="text-lg font-semibold mb-6">API & MCP tokens</h1>
+    <h1 class="text-lg font-semibold mb-2">API & MCP tokens</h1>
+    <p class="text-sm text-slate-500 mb-6"><a href="{{ route('settings.password') }}" class="underline">Change your password</a></p>
 
     @if (session('plainTextToken'))
         <div class="mb-6 rounded-lg bg-amber-50 border border-amber-200 p-4 text-sm">
