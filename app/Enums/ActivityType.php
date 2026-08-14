@@ -12,6 +12,7 @@ namespace App\Enums;
 enum ActivityType: string
 {
     case StudySession = 'study_session';
+    case QuestionReview = 'question_review';
     case Workout = 'workout';
     case RecurringCompletion = 'recurring_completion';
     case Milestone = 'milestone';
@@ -23,6 +24,7 @@ enum ActivityType: string
     {
         return match ($this) {
             self::StudySession => 'Study session',
+            self::QuestionReview => 'Question review',
             self::Workout => 'Workout',
             self::RecurringCompletion => 'Recurring completion',
             self::Milestone => 'Milestone update',

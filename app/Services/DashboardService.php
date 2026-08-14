@@ -66,7 +66,7 @@ class DashboardService
 
     public function goalDashboard(Goal $goal): array
     {
-        return [
+        $data = [
             'progress' => $goal->progress(),
             'topics_completed' => $goal->topics()->where('status', 'completed')->count(),
             'topics_total' => $goal->topics()->count(),
@@ -78,5 +78,19 @@ class DashboardService
             'current_streak' => $this->streaks->currentStreak($goal),
             'longest_streak' => $this->streaks->longestStreak($goal),
         ];
+
+        // Question coverage is an optional secondary metric on top of topic
+        // progress (not every study goal needs it) — signalled by the goal
+        // having a "questions" target_unit, e.g. PHP/Laravel's 550-question
+        // bank. The question bank itself is never stored here, only the count.
+        if ($goal->target_unit === 'questions' && $goal->target_value) {
+            $data['questions_total'] = (int) $goal->target_value;
+            $data['questions_completed'] = min(
+                $data['questions_total'],
+                (int) $goal->activities()->where('type', 'question_review')->sum('value')
+            );
+        }
+
+        return $data;
     }
 }

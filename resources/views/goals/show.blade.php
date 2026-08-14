@@ -50,6 +50,18 @@
         </div>
     </div>
 
+    @if (isset($dash['questions_total']))
+        <div class="mb-8 bg-white rounded-xl border border-slate-200 p-4">
+            <div class="flex items-center justify-between mb-2">
+                <p class="text-sm font-semibold">Question coverage</p>
+                <p class="text-sm text-slate-600">{{ $dash['questions_completed'] }} / {{ $dash['questions_total'] }}</p>
+            </div>
+            <div class="h-2 bg-slate-100 rounded-full overflow-hidden">
+                <div class="h-full bg-slate-900" style="width: {{ $dash['questions_total'] > 0 ? min(100, round($dash['questions_completed'] / $dash['questions_total'] * 100)) : 0 }}%"></div>
+            </div>
+        </div>
+    @endif
+
     <div class="grid md:grid-cols-2 gap-8">
         <div>
             <div class="flex items-center justify-between mb-2">
@@ -108,13 +120,14 @@
                 </select>
                 <div class="grid grid-cols-2 gap-2">
                     <input type="number" name="duration_minutes" placeholder="Minutes" class="rounded-lg border-slate-300 text-sm">
-                    <select name="topic_id" class="rounded-lg border-slate-300 text-sm">
-                        <option value="">No topic</option>
-                        @foreach ($goal->topics as $topic)
-                            <option value="{{ $topic->id }}">{{ $topic->name }}</option>
-                        @endforeach
-                    </select>
+                    <input type="number" name="value" placeholder="Count (e.g. questions)" step="1" min="0" class="rounded-lg border-slate-300 text-sm">
                 </div>
+                <select name="topic_id" class="w-full rounded-lg border-slate-300 text-sm">
+                    <option value="">No topic</option>
+                    @foreach ($goal->topics as $topic)
+                        <option value="{{ $topic->id }}">{{ $topic->name }}</option>
+                    @endforeach
+                </select>
                 <textarea name="description" placeholder="Notes" class="w-full rounded-lg border-slate-300 text-sm"></textarea>
                 <button class="w-full px-3 py-2 rounded-lg bg-slate-900 text-white text-sm">Log progress</button>
             </form>
