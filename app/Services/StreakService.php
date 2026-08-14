@@ -18,7 +18,7 @@ class StreakService
     public function completionRate(Goal $goal): float
     {
         $frequencyPerWeek = (int) ($goal->settings['target_count'] ?? 1);
-        $start = $goal->start_date ?? $goal->created_at->toDateImmutable();
+        $start = $goal->start_date ?? $goal->created_at;
         $weeksElapsed = max(1, CarbonImmutable::parse($start)->diffInWeeks(now(), true));
         $weeksElapsed = (int) ceil($weeksElapsed) ?: 1;
 
