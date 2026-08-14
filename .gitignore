@@ -21,4 +21,4 @@ yarn-error.log
 /.vscode
 /.zed
 database/database.sqlite
-
+composer.lock
