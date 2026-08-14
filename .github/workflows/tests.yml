@@ -17,7 +17,7 @@ jobs:
         uses: shivammathur/setup-php@v2
         with:
           php-version: '8.3'
-          extensions: mbstring, pdo_sqlite, sqlite3, bcmath, intl, zip
+          extensions: mbstring, pdo_sqlite, sqlite3, bcmath, intl, zip, curl, xml, dom, fileinfo, openssl, ctype, tokenizer, json, gd
           coverage: none
 
       - name: Setup Node
