@@ -349,16 +349,5 @@ Never expose this file publicly — keep it outside `public/`.
   then check the 🔊 panel toggles and volumes.
 - **MCP tool returns 403** — the token is missing the ability that tool
   requires; issue a new token with the right abilities in Settings.
-
----
-
-## Known limitations
-
-- No live deployment configuration is included yet (see "Deployment").
-- The MCP server is a self-contained stdio implementation of the MCP JSON-RPC
-  protocol (no third-party package); it covers tools only — resources and
-  prompts are not exposed.
-- Notifications are intentionally not built; the schema and services don't
-  preclude adding them later.
-- "Needs attention" logic on the dashboard is simple and deterministic — no
+he dashboard is simple and deterministic — no
   AI recommendation engine.
