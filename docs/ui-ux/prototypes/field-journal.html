@@ -522,7 +522,8 @@ document.querySelectorAll('.seg').forEach(g=>g.addEventListener('click',e=>{
   if(e.target.tagName==='BUTTON'){ g.querySelectorAll('button').forEach(b=>b.classList.remove('on')); e.target.classList.add('on'); }
 }));
 document.addEventListener('keydown',e=>{ if(e.key==='Escape') closeLog(); });
-go('dashboard');
+go(location.hash.replace('#','') || 'dashboard');
+window.addEventListener('hashchange',()=>go(location.hash.replace('#','')||'dashboard'));
 </script>
 </body>
 </html>
