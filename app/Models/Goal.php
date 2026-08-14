@@ -17,6 +17,18 @@ class Goal extends Model
     /** @use HasFactory<\Database\Factories\GoalFactory> */
     use HasFactory;
 
+    /**
+     * In-memory defaults matching the DB column defaults (spec section 10-11).
+     * Without these, a freshly-created (not re-fetched) model instance has
+     * a null status/priority attribute until it's reloaded from the
+     * database, which breaks the enum cast wherever the model is used
+     * immediately after creation (e.g. API responses).
+     */
+    protected $attributes = [
+        'status' => 'active',
+        'priority' => 'medium',
+    ];
+
     protected $fillable = [
         'user_id',
         'name',
