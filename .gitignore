@@ -22,3 +22,7 @@ yarn-error.log
 /.zed
 database/database.sqlite
 composer.lock
+/.phpunit.result.cache
+storage/framework/views/*.php
+!storage/framework/views/.gitkeep
+storage/logs/*.log
