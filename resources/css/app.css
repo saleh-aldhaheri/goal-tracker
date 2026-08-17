@@ -188,12 +188,13 @@ body,.side,.tickerbar,.card,.stat,.hero,.btn,.chip,.row-item,.check,.nav a,.attn
 .row-item .grow{flex:1;min-width:0}
 .row-item .t{font-size:14px;font-weight:500}
 .row-item .s{font-family:"IBM Plex Mono",monospace;font-size:11px;color:var(--dim)}
-.check{width:20px;height:20px;border:1.5px solid var(--line2);display:grid;place-items:center;flex:0 0 auto;transition:.15s}
+.check{width:22px;height:22px;border:2px solid var(--brass-line);border-radius:4px;display:grid;place-items:center;flex:0 0 auto;transition:.15s;background:var(--panel3)}
 .check.done{background:var(--brass);border-color:var(--brass);animation:clack .2s ease}
 @keyframes clack{0%{transform:scale(.5)}70%{transform:scale(1.2)}100%{transform:scale(1)}}
-.check.done::after{content:"✓";font-family:"IBM Plex Mono",monospace;font-weight:600;color:var(--on-brass);font-size:13px}
+.check.done::after{content:"✓";font-family:"IBM Plex Mono",monospace;font-weight:600;color:var(--on-brass);font-size:14px}
 .row-item.done .t{text-decoration:line-through;color:var(--dim2)}
-.checkbtn{background:none;border:none;padding:0;display:grid;place-items:center}
+.checkbtn{background:var(--panel3);border:2px solid var(--brass-line);padding:0;display:grid;place-items:center;cursor:pointer}
+.checkbtn:hover{border-color:var(--brass);background:var(--brass-dim);transform:scale(1.06)}
 
 .timeline{position:relative;padding-left:22px}
 .timeline::before{content:"";position:absolute;left:7px;top:4px;bottom:4px;width:1px;background:var(--line2)}
