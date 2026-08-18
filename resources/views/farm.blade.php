@@ -38,7 +38,7 @@
                 <svg viewBox="0 0 96 84" shape-rendering="crispEdges">
                     <defs>
                         <filter id="winblur" x="-60%" y="-60%" width="220%" height="220%">
-                            <feGaussianBlur stdDeviation="3.2"/>
+                            <feGaussianBlur stdDeviation="1.4"/>
                         </filter>
                     </defs>
 
@@ -61,8 +61,8 @@
                     <polygon points="36,20 48,10 60,20" fill="none" stroke="#3a2f22" stroke-width="1.6"/>
                     <rect x="41" y="20" width="14" height="11" fill="#f2e7d0"/>
                     <rect x="41" y="20" width="14" height="11" fill="none" stroke="#3a2f22" stroke-width="1.6"/>
-                    <circle class="winglow2" cx="48" cy="26" r="17" fill="#ffc857" filter="url(#winblur)"/>
-                    <circle class="winglow" cx="48" cy="26" r="9" fill="#ffc857" filter="url(#winblur)"/>
+                    <circle class="winglow2" cx="48" cy="26" r="6" fill="#ffc857" filter="url(#winblur)"/>
+                    <circle class="winglow" cx="48" cy="26" r="3.5" fill="#ffc857" filter="url(#winblur)"/>
                     <rect class="window" x="43" y="22" width="10" height="7"/>
                     <rect x="43" y="22" width="10" height="7" fill="none" stroke="#3a2f22" stroke-width="1.4"/>
                     <line x1="48" y1="22" x2="48" y2="29" stroke="#3a2f22" stroke-width="1.2"/>
@@ -76,10 +76,10 @@
                     <rect x="62" y="8" width="13" height="3" fill="#6b4a2f"/>
 
                     <!-- ground-floor windows, glow drawn UNDER the pane so it bleeds outward at night -->
-                    <circle class="winglow2" cx="28" cy="47" r="22" fill="#ffc857" filter="url(#winblur)"/>
-                    <circle class="winglow2" cx="68" cy="47" r="22" fill="#ffc857" filter="url(#winblur)"/>
-                    <circle class="winglow" cx="28" cy="47" r="12" fill="#ffc857" filter="url(#winblur)"/>
-                    <circle class="winglow" cx="68" cy="47" r="12" fill="#ffc857" filter="url(#winblur)"/>
+                    <circle class="winglow2" cx="28" cy="47" r="8" fill="#ffc857" filter="url(#winblur)"/>
+                    <circle class="winglow2" cx="68" cy="47" r="8" fill="#ffc857" filter="url(#winblur)"/>
+                    <circle class="winglow" cx="28" cy="47" r="5" fill="#ffc857" filter="url(#winblur)"/>
+                    <circle class="winglow" cx="68" cy="47" r="5" fill="#ffc857" filter="url(#winblur)"/>
                     <rect class="window" x="22" y="41" width="14" height="12"/>
                     <rect class="window" x="60" y="41" width="14" height="12"/>
                     <rect x="22" y="41" width="14" height="12" fill="none" stroke="#3a2f22" stroke-width="2"/>
@@ -218,7 +218,11 @@
             // quantization, so plots don't line up even with just a few
             // goals. minY/maxY roughly track the visible grass band; minX
             // keeps clear of the house.
-            const minX = 28, maxX = 94, minY = 13, maxY = 54;
+            // Bounded to the flat ground/bed strip only (not the curved hill
+            // silhouette behind it) — the hills dip lower near the screen
+            // edges, so a flat rectangular bound reaching further up would
+            // let flowers float above the hill line there.
+            const minX = 28, maxX = 95, minY = 9, maxY = 30;
             const w = maxX - minX, h = maxY - minY;
             const area = w * h;
             const minDist = Math.max(7, Math.min(20, Math.sqrt(area / n) * 0.62));

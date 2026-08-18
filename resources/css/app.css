@@ -321,9 +321,9 @@ body.fadein .wrap{animation:fadeUp .4s ease}
 .farm .housewrap .window{fill:#dcefff;transition:fill 1.5s ease}
 .farm[data-time="night"] .housewrap .window{fill:#ffc857}
 .farm .housewrap .winglow{opacity:0;transition:opacity 1.5s ease}
-.farm[data-time="night"] .housewrap .winglow{opacity:.95;animation:winflicker 4s ease-in-out infinite}
+.farm[data-time="night"] .housewrap .winglow{opacity:.85;animation:winflicker 4s ease-in-out infinite}
 .farm .housewrap .winglow2{opacity:0;transition:opacity 1.8s ease}
-.farm[data-time="night"] .housewrap .winglow2{opacity:.5;animation:winflicker 4s ease-in-out infinite .3s}
+.farm[data-time="night"] .housewrap .winglow2{opacity:.3;animation:winflicker 4s ease-in-out infinite .3s}
 @keyframes winflicker{0%,100%{opacity:.75}45%{opacity:.6}50%{opacity:.85}55%{opacity:.65}}
 .farm .smoke{position:absolute;top:6%;left:74%;width:12px;height:12px;border-radius:50%;background:rgba(220,220,220,.5);animation:smoke 6s ease-in infinite}
 .farm .smoke.s2{animation-delay:3s;left:78%}
