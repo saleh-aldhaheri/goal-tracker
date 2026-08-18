@@ -35,26 +35,65 @@
 
             <div class="housewrap">
                 <div class="lawn"></div>
-                <svg viewBox="0 0 96 74" shape-rendering="crispEdges">
-                    <circle class="winglow" cx="28" cy="42" r="17" fill="#ffd98a"/>
-                    <circle class="winglow" cx="68" cy="42" r="17" fill="#ffd98a"/>
+                <svg viewBox="0 0 96 84" shape-rendering="crispEdges">
+                    <defs>
+                        <filter id="winblur" x="-60%" y="-60%" width="220%" height="220%">
+                            <feGaussianBlur stdDeviation="3.2"/>
+                        </filter>
+                    </defs>
+
+                    <!-- porch steps -->
+                    <rect x="40" y="68" width="20" height="3" fill="#4a3826"/>
+                    <rect x="42" y="65" width="16" height="3" fill="#5a4530"/>
+
+                    <!-- main structure -->
                     <rect x="14" y="60" width="68" height="5" fill="#5f4027"/>
                     <rect x="16" y="36" width="64" height="26" fill="#f2e7d0"/>
                     <rect x="16" y="36" width="64" height="26" fill="none" stroke="#3a2f22" stroke-width="2"/>
+
+                    <!-- roof + ridge cap -->
                     <polygon points="6,38 48,6 90,38" fill="#c96a4a"/>
                     <polygon points="6,38 48,6 90,38" fill="none" stroke="#3a2f22" stroke-width="2"/>
+                    <rect x="45" y="6" width="6" height="3" fill="#a8563c"/>
+
+                    <!-- dormer window on the upper floor, gives the house a bigger/taller silhouette -->
+                    <polygon points="36,20 48,10 60,20" fill="#b45d40"/>
+                    <polygon points="36,20 48,10 60,20" fill="none" stroke="#3a2f22" stroke-width="1.6"/>
+                    <rect x="41" y="20" width="14" height="11" fill="#f2e7d0"/>
+                    <rect x="41" y="20" width="14" height="11" fill="none" stroke="#3a2f22" stroke-width="1.6"/>
+                    <circle class="winglow2" cx="48" cy="26" r="17" fill="#ffc857" filter="url(#winblur)"/>
+                    <circle class="winglow" cx="48" cy="26" r="9" fill="#ffc857" filter="url(#winblur)"/>
+                    <rect class="window" x="43" y="22" width="10" height="7"/>
+                    <rect x="43" y="22" width="10" height="7" fill="none" stroke="#3a2f22" stroke-width="1.4"/>
+                    <line x1="48" y1="22" x2="48" y2="29" stroke="#3a2f22" stroke-width="1.2"/>
+
+                    <!-- door + chimney -->
                     <rect x="44" y="46" width="12" height="16" fill="#6b4a2f"/>
+                    <rect x="44" y="46" width="12" height="16" fill="none" stroke="#3a2f22" stroke-width="1.6"/>
                     <rect x="52" y="55" width="2" height="3" fill="#e8c97a"/>
-                    <rect class="window" x="24" y="42" width="12" height="10"/>
-                    <rect class="window" x="62" y="42" width="12" height="10"/>
-                    <rect x="24" y="42" width="12" height="10" fill="none" stroke="#3a2f22" stroke-width="2"/>
-                    <rect x="62" y="42" width="12" height="10" fill="none" stroke="#3a2f22" stroke-width="2"/>
-                    <line x1="30" y1="42" x2="30" y2="52" stroke="#3a2f22" stroke-width="2"/>
-                    <line x1="24" y1="47" x2="36" y2="47" stroke="#3a2f22" stroke-width="2"/>
-                    <line x1="68" y1="42" x2="68" y2="52" stroke="#3a2f22" stroke-width="2"/>
-                    <line x1="62" y1="47" x2="74" y2="47" stroke="#3a2f22" stroke-width="2"/>
-                    <rect x="64" y="12" width="9" height="16" fill="#8a6a4a"/>
-                    <rect x="64" y="12" width="9" height="16" fill="none" stroke="#3a2f22" stroke-width="2"/>
+                    <rect x="64" y="10" width="9" height="18" fill="#8a6a4a"/>
+                    <rect x="64" y="10" width="9" height="18" fill="none" stroke="#3a2f22" stroke-width="2"/>
+                    <rect x="62" y="8" width="13" height="3" fill="#6b4a2f"/>
+
+                    <!-- ground-floor windows, glow drawn UNDER the pane so it bleeds outward at night -->
+                    <circle class="winglow2" cx="28" cy="47" r="22" fill="#ffc857" filter="url(#winblur)"/>
+                    <circle class="winglow2" cx="68" cy="47" r="22" fill="#ffc857" filter="url(#winblur)"/>
+                    <circle class="winglow" cx="28" cy="47" r="12" fill="#ffc857" filter="url(#winblur)"/>
+                    <circle class="winglow" cx="68" cy="47" r="12" fill="#ffc857" filter="url(#winblur)"/>
+                    <rect class="window" x="22" y="41" width="14" height="12"/>
+                    <rect class="window" x="60" y="41" width="14" height="12"/>
+                    <rect x="22" y="41" width="14" height="12" fill="none" stroke="#3a2f22" stroke-width="2"/>
+                    <rect x="60" y="41" width="14" height="12" fill="none" stroke="#3a2f22" stroke-width="2"/>
+                    <line x1="29" y1="41" x2="29" y2="53" stroke="#3a2f22" stroke-width="2"/>
+                    <line x1="22" y1="47" x2="36" y2="47" stroke="#3a2f22" stroke-width="2"/>
+                    <line x1="67" y1="41" x2="67" y2="53" stroke="#3a2f22" stroke-width="2"/>
+                    <line x1="60" y1="47" x2="74" y2="47" stroke="#3a2f22" stroke-width="2"/>
+
+                    <!-- window flower boxes -->
+                    <rect x="21" y="53" width="16" height="3" fill="#6b4a2f"/>
+                    <rect x="59" y="53" width="16" height="3" fill="#6b4a2f"/>
+                    <circle cx="24" cy="53" r="1.6" fill="#e85d75"/><circle cx="29" cy="53" r="1.6" fill="#ffd166"/><circle cx="34" cy="53" r="1.6" fill="#e85d75"/>
+                    <circle cx="62" cy="53" r="1.6" fill="#ffd166"/><circle cx="67" cy="53" r="1.6" fill="#e85d75"/><circle cx="72" cy="53" r="1.6" fill="#ffd166"/>
                 </svg>
                 <div class="smoke"></div><div class="smoke s2"></div>
             </div>
@@ -166,17 +205,51 @@
             return "In full bloom — you did it! " + g.progress + "% complete.";
         }
 
+        // Scatters goals across the whole ground area instead of a rigid
+        // grid. Uses a jittered-cell approach: divide the usable region
+        // into more cells than goals, shuffle the cells, place one flower
+        // per chosen cell with a large random offset inside it. This
+        // guarantees no overlaps (each flower keeps its own cell) while
+        // still reading as organic scatter rather than a grid, because the
+        // jitter covers most of each cell and cell order is randomized.
         function layout(n) {
-            const arr = [];
-            const cols = Math.ceil(n / 2);
+            if (n === 0) return [];
+            // True scatter via "best of k" rejection sampling — no grid/row
+            // quantization, so plots don't line up even with just a few
+            // goals. minY/maxY roughly track the visible grass band; minX
+            // keeps clear of the house.
+            const minX = 28, maxX = 94, minY = 13, maxY = 54;
+            const w = maxX - minX, h = maxY - minY;
+            const area = w * h;
+            const minDist = Math.max(7, Math.min(20, Math.sqrt(area / n) * 0.62));
+
+            const placed = [];
             for (let i = 0; i < n; i++) {
-                const c = i % cols, r = Math.floor(i / cols);
-                const left = 28 + c * (62 / Math.max(1, cols - 1)) + (Math.random() * 4 - 2);
-                const bottom = 20 + r * 7 + (Math.random() * 3);
-                const s = 0.85 + r * 0.15 + Math.random() * 0.15;
-                arr.push({ left: Math.min(90, Math.max(26, Math.round(left))), bottom: Math.round(bottom), s: +s.toFixed(2), z: Math.round(bottom * 10) });
+                let best = null, bestScore = -1;
+                for (let attempt = 0; attempt < 30; attempt++) {
+                    const left = minX + Math.random() * w;
+                    const bottom = minY + Math.random() * h;
+                    let nearest = Infinity;
+                    for (const p of placed) {
+                        // Weight the x-axis down slightly: the scene is much
+                        // wider than it is tall, so pure euclidean distance
+                        // under-penalizes vertical clumping.
+                        const d = Math.hypot((left - p.left) * 0.75, bottom - p.bottom);
+                        nearest = Math.min(nearest, d);
+                    }
+                    if (nearest > bestScore) { bestScore = nearest; best = { left, bottom }; }
+                    if (nearest >= minDist) break;
+                }
+                const depth = (best.bottom - minY) / h; // 0 = front, 1 = back
+                const s = 0.78 + (1 - depth) * 0.35 + (Math.random() * 0.1 - 0.05);
+                placed.push({
+                    left: Math.round(best.left * 10) / 10,
+                    bottom: Math.round(best.bottom * 10) / 10,
+                    s: +s.toFixed(2),
+                    z: Math.round(best.bottom * 10),
+                });
             }
-            return arr;
+            return placed;
         }
 
         function render() {
