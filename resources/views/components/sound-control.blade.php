@@ -6,10 +6,17 @@
             <span>Music</span>
             <select id="sndSong" class="select">
                 <option value="off">Off</option>
-                <option value="calm">Calm Day</option>
-                <option value="focus">Focus</option>
-                <option value="rainy">Rainy</option>
-                <option value="night">Night</option>
+                <optgroup label="Ambient">
+                    <option value="calm">Calm Day</option>
+                    <option value="rainy">Rainy</option>
+                    <option value="night">Night</option>
+                </optgroup>
+                <optgroup label="Focus">
+                    <option value="focus">Focus</option>
+                    <option value="deepfocus">Deep Focus</option>
+                    <option value="lofi">Lo-fi Focus</option>
+                    <option value="minimal">Minimal</option>
+                </optgroup>
             </select>
         </label>
         <label class="snd-row"><span>Music volume</span><input type="range" id="sndMusicVol" min="0" max="1" step="0.01"></label>

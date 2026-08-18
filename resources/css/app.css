@@ -31,7 +31,8 @@ body,.side,.tickerbar,.card,.stat,.hero,.btn,.chip,.row-item,.check,.nav a,.attn
 [data-theme="dark"] .ambient .sky::after{opacity:1}
 .ambient .stars{position:absolute;inset:0;opacity:0;transition:opacity 1.6s ease}
 [data-theme="dark"] .ambient .stars{opacity:1}
-.ambient .star{position:absolute;width:2px;height:2px;background:#fff;border-radius:50%;animation:ambtwinkle 3s ease-in-out infinite}
+.ambient .star{position:absolute;width:2px;height:2px;background:#fff;border-radius:50%;animation:ambtwinkle 3s ease-in-out infinite;animation-play-state:paused}
+[data-theme="dark"] .ambient .star{animation-play-state:running}
 @keyframes ambtwinkle{0%,100%{opacity:.15}50%{opacity:.9}}
 .ambient .clouds{position:absolute;inset:0;overflow:hidden}
 .ambient .cloud{position:absolute;background:#fff;border-radius:999px;filter:blur(7px);opacity:.06;animation:ambdrift linear infinite}
@@ -46,7 +47,8 @@ body,.side,.tickerbar,.card,.stat,.hero,.btn,.chip,.row-item,.check,.nav a,.attn
 @keyframes ambdrift{to{transform:translateX(145vw)}}
 .ambient .wind{position:absolute;inset:0;opacity:0;transition:opacity 1.6s ease;overflow:hidden}
 [data-theme="light"] .ambient .wind{opacity:1}
-.ambient .streak{position:absolute;height:2px;width:160px;background:linear-gradient(90deg,transparent,rgba(120,150,120,.4),transparent);border-radius:2px;animation:ambblow linear infinite}
+.ambient .streak{position:absolute;height:2px;width:160px;background:linear-gradient(90deg,transparent,rgba(120,150,120,.4),transparent);border-radius:2px;animation:ambblow linear infinite;animation-play-state:paused}
+[data-theme="light"] .ambient .streak{animation-play-state:running}
 @keyframes ambblow{0%{transform:translateX(-180px)}100%{transform:translateX(115vw)}}
 .ambient .pollen{position:absolute;width:6px;height:6px;border-radius:50%;background:rgba(178,168,88,.5);animation:ambfall linear infinite}
 @keyframes ambfall{0%{transform:translateY(-8vh) rotate(0)}100%{transform:translateY(108vh) rotate(340deg)}}
@@ -291,7 +293,8 @@ body.fadein .wrap{animation:fadeUp .4s ease}
 .farm[data-time="night"] .moon{opacity:.95;transform:none}
 .farm .stars{position:absolute;inset:0 0 40% 0;opacity:0;transition:opacity 1.6s ease}
 .farm[data-time="night"] .stars{opacity:1}
-.farm .star{position:absolute;width:2px;height:2px;background:#fff;border-radius:50%;animation:twinkle 3s ease-in-out infinite}
+.farm .star{position:absolute;width:2px;height:2px;background:#fff;border-radius:50%;animation:twinkle 3s ease-in-out infinite;animation-play-state:paused}
+.farm[data-time="night"] .star{animation-play-state:running}
 @keyframes twinkle{0%,100%{opacity:.2}50%{opacity:1}}
 .farm .clouds{position:absolute;inset:0}
 .farm .cloud{position:absolute;background:#fff;border-radius:999px;opacity:.85;animation:drift linear infinite}
@@ -329,11 +332,13 @@ body.fadein .wrap{animation:fadeUp .4s ease}
 @keyframes sway{0%,100%{transform:rotate(-2deg)}50%{transform:rotate(2deg)}}
 .farm .rain{position:absolute;inset:0;opacity:0;transition:opacity 1s;pointer-events:none;z-index:6}
 .farm[data-raining="1"] .rain{opacity:1}
-.farm .drop{position:absolute;top:-20px;width:2px;height:14px;background:linear-gradient(180deg,transparent,#a9d4ff);border-radius:2px;animation:fall linear infinite}
+.farm .drop{position:absolute;top:-20px;width:2px;height:14px;background:linear-gradient(180deg,transparent,#a9d4ff);border-radius:2px;animation:fall linear infinite;animation-play-state:paused}
+.farm[data-raining="1"] .drop{animation-play-state:running}
 @keyframes fall{to{transform:translateY(115vh)}}
 .farm .fireflies{position:absolute;inset:0;z-index:6;opacity:.12;pointer-events:none;transition:opacity 1.6s ease}
 .farm[data-time="night"] .fireflies{opacity:1}
-.farm .fly{position:absolute;width:5px;height:5px;border-radius:50%;background:#ffe08a;box-shadow:0 0 8px 2px #ffd98a;animation:flyfloat linear infinite alternate}
+.farm .fly{position:absolute;width:5px;height:5px;border-radius:50%;background:#ffe08a;box-shadow:0 0 8px 2px #ffd98a;animation:flyfloat linear infinite alternate;animation-play-state:paused}
+.farm[data-time="night"] .fly{animation-play-state:running}
 @keyframes flyfloat{0%{transform:translate(0,0);opacity:.3}100%{transform:translate(26px,-20px);opacity:1}}
 .farm .plots{position:absolute;inset:0;z-index:5}
 .farm .plot{position:absolute;display:flex;flex-direction:column;align-items:center;gap:7px;cursor:pointer;transform-origin:50% 100%}
@@ -375,7 +380,33 @@ body.fadein .wrap{animation:fadeUp .4s ease}
 .farm-tip .tt-msg{margin-top:8px;color:var(--fk-ink);font-size:11px;line-height:1.55;font-style:italic}
 .farm-empty{position:absolute;inset:0;display:grid;place-items:center;z-index:8;text-align:center;color:var(--fk-ink)}
 .farm-empty a{color:#ffd166}
-@media (prefers-reduced-motion:reduce){.farm .scene,.farm .cloud,.farm .star,.farm .drop,.farm .tuft svg,.farm .flowerbox svg{animation:none!important}}
+.farm .butterflies{position:absolute;inset:0 0 45% 0;z-index:6;pointer-events:none;opacity:0;transition:opacity 1.4s ease}
+.farm[data-time="day"] .butterflies{opacity:1}
+.farm .bfly{position:absolute;width:8px;height:6px;animation:flit 9s ease-in-out infinite;animation-play-state:paused}
+.farm[data-time="day"] .bfly{animation-play-state:running}
+.farm .bfly::before,.farm .bfly::after{content:"";position:absolute;top:0;width:4px;height:6px;border-radius:60% 60% 60% 60%/70% 70% 30% 30%;animation:wingflap .22s ease-in-out infinite alternate}
+.farm .bfly::before{left:0;background:var(--bc1,#ffb3d9)}
+.farm .bfly::after{right:0;background:var(--bc2,#ffd166);animation-delay:.11s}
+@keyframes wingflap{0%{transform:scaleX(1)}100%{transform:scaleX(.35)}}
+@keyframes flit{
+  0%{transform:translate(0,0) rotate(0deg)}
+  20%{transform:translate(40px,-18px) rotate(8deg)}
+  40%{transform:translate(70px,10px) rotate(-6deg)}
+  60%{transform:translate(30px,28px) rotate(10deg)}
+  80%{transform:translate(-20px,6px) rotate(-8deg)}
+  100%{transform:translate(0,0) rotate(0deg)}
+}
+.farm .bird{position:absolute;top:12%;left:-6%;width:16px;height:8px;opacity:0;z-index:7;pointer-events:none}
+.farm .bird.fly{animation:birdpass 14s linear forwards;opacity:.8}
+.farm .bird::before,.farm .bird::after{content:"";position:absolute;top:2px;width:8px;height:2px;background:var(--fk-dim,#8a8578);border-radius:2px;animation:birdwing 1s ease-in-out infinite alternate}
+.farm .bird::before{left:0;transform-origin:100% 50%}
+.farm .bird::after{left:8px;transform-origin:0 50%;animation-delay:.5s}
+@keyframes birdwing{0%{transform:rotate(-18deg)}100%{transform:rotate(18deg)}}
+@keyframes birdpass{0%{transform:translate(0,0)}50%{transform:translate(60vw,-30px)}100%{transform:translate(122vw,6px)}}
+.farm .flowerbox.bloom svg{animation:sway 4s ease-in-out infinite,breathe 3.6s ease-in-out infinite}
+@keyframes breathe{0%,100%{transform:scale(1)}50%{transform:scale(1.035)}}
+.farm.tab-hidden .scene *{animation-play-state:paused!important}
+@media (prefers-reduced-motion:reduce){.farm .scene,.farm .cloud,.farm .star,.farm .drop,.farm .tuft svg,.farm .flowerbox svg,.farm .bfly,.farm .bird{animation:none!important}}
 @media (max-width:640px){.farm .housewrap{width:150px;bottom:24%}.farm .flowerbox{width:68px;height:78px}.farm .flowerbox svg{height:74px}.farm .hud h1{font-size:13px}}
 
 /* ============ Homestead gamification ============ */

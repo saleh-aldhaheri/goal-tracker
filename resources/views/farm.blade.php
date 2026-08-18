@@ -62,6 +62,8 @@
             <div class="tufts" id="tufts"></div>
             <div class="rain" id="rain"></div>
             <div class="fireflies" id="fireflies"></div>
+            <div class="butterflies" id="butterflies"></div>
+            <div id="birdSlot"></div>
             <div class="plots" id="plots"></div>
 
             @if ($goals->isEmpty())
@@ -216,10 +218,41 @@
         }
         function hideTip() { tip.classList.remove('show'); }
 
-        function buildRain() { const r = document.getElementById('rain'); for (let i = 0; i < 70; i++) { const d = document.createElement('div'); d.className = 'drop'; d.style.left = Math.random() * 100 + '%'; d.style.animationDuration = (0.7 + Math.random() * 0.8) + 's'; d.style.animationDelay = (Math.random() * 1.5) + 's'; d.style.opacity = 0.4 + Math.random() * 0.6; r.appendChild(d); } }
-        function buildFireflies() { const f = document.getElementById('fireflies'); for (let i = 0; i < 14; i++) { const d = document.createElement('div'); d.className = 'fly'; d.style.left = Math.random() * 100 + '%'; d.style.top = (28 + Math.random() * 52) + '%'; d.style.animationDuration = (4 + Math.random() * 5) + 's'; d.style.animationDelay = (Math.random() * 4) + 's'; f.appendChild(d); } }
-        function buildStars() { const s = document.getElementById('stars'); for (let i = 0; i < 80; i++) { const st = document.createElement('div'); st.className = 'star'; st.style.left = Math.random() * 100 + '%'; st.style.top = Math.random() * 55 + '%'; st.style.animationDelay = (Math.random() * 3) + 's'; s.appendChild(st); } }
-        function buildTufts() { const box = document.getElementById('tufts'); const shades = ['#4c9a54', '#5aa860', '#418b48', '#6db76a']; for (let i = 0; i < 110; i++) { const t = document.createElement('div'); t.className = 'tuft'; t.style.left = Math.random() * 100 + '%'; t.style.bottom = (Math.random() * 28) + '%'; const c = shades[Math.floor(Math.random() * shades.length)]; const h1 = 6 + Math.floor(Math.random() * 4), h2 = 4 + Math.floor(Math.random() * 4); t.innerHTML = '<svg viewBox="0 0 10 10" shape-rendering="crispEdges" style="animation-delay:' + (Math.random() * 5).toFixed(2) + 's"><rect x="1" y="' + (10 - h1) + '" width="2" height="' + h1 + '" fill="' + c + '"/><rect x="4" y="' + (10 - h2) + '" width="2" height="' + h2 + '" fill="' + c + '"/><rect x="7" y="' + (10 - h1) + '" width="2" height="' + h1 + '" fill="' + c + '"/></svg>'; box.appendChild(t); } }
+        function buildRain() { const r = document.getElementById('rain'); for (let i = 0; i < 60; i++) { const d = document.createElement('div'); d.className = 'drop'; d.style.left = Math.random() * 100 + '%'; d.style.animationDuration = (0.7 + Math.random() * 0.8) + 's'; d.style.animationDelay = (Math.random() * 1.5) + 's'; d.style.opacity = 0.4 + Math.random() * 0.6; r.appendChild(d); } }
+        function buildFireflies() { const f = document.getElementById('fireflies'); for (let i = 0; i < 10; i++) { const d = document.createElement('div'); d.className = 'fly'; d.style.left = Math.random() * 100 + '%'; d.style.top = (28 + Math.random() * 52) + '%'; d.style.animationDuration = (4 + Math.random() * 5) + 's'; d.style.animationDelay = (Math.random() * 4) + 's'; f.appendChild(d); } }
+        function buildStars() { const s = document.getElementById('stars'); for (let i = 0; i < 60; i++) { const st = document.createElement('div'); st.className = 'star'; st.style.left = Math.random() * 100 + '%'; st.style.top = Math.random() * 55 + '%'; st.style.animationDelay = (Math.random() * 3) + 's'; s.appendChild(st); } }
+        function buildTufts() { const box = document.getElementById('tufts'); const shades = ['#4c9a54', '#5aa860', '#418b48', '#6db76a']; for (let i = 0; i < 85; i++) { const t = document.createElement('div'); t.className = 'tuft'; t.style.left = Math.random() * 100 + '%'; t.style.bottom = (Math.random() * 28) + '%'; const c = shades[Math.floor(Math.random() * shades.length)]; const h1 = 6 + Math.floor(Math.random() * 4), h2 = 4 + Math.floor(Math.random() * 4); t.innerHTML = '<svg viewBox="0 0 10 10" shape-rendering="crispEdges" style="animation-delay:' + (Math.random() * 5).toFixed(2) + 's"><rect x="1" y="' + (10 - h1) + '" width="2" height="' + h1 + '" fill="' + c + '"/><rect x="4" y="' + (10 - h2) + '" width="2" height="' + h2 + '" fill="' + c + '"/><rect x="7" y="' + (10 - h1) + '" width="2" height="' + h1 + '" fill="' + c + '"/></svg>'; box.appendChild(t); } }
+        function buildButterflies() {
+            if (!GOALS.length) return;
+            const box = document.getElementById('butterflies');
+            const pairs = [['#ffb3d9', '#ffd166'], ['#a9d4ff', '#c8f2c0'], ['#ffd166', '#ff9d9d']];
+            const n = Math.min(3, Math.max(1, Math.ceil(GOALS.length / 2)));
+            for (let i = 0; i < n; i++) {
+                const b = document.createElement('div');
+                b.className = 'bfly';
+                b.style.left = (15 + Math.random() * 60) + '%';
+                b.style.top = (35 + Math.random() * 40) + '%';
+                b.style.animationDuration = (7 + Math.random() * 5) + 's';
+                b.style.animationDelay = (Math.random() * 4) + 's';
+                const [c1, c2] = pairs[i % pairs.length];
+                b.style.setProperty('--bc1', c1);
+                b.style.setProperty('--bc2', c2);
+                box.appendChild(b);
+            }
+        }
+        function flyBird() {
+            if (document.hidden) return; // no point animating a background tab
+            const slot = document.getElementById('birdSlot');
+            const b = document.createElement('div');
+            b.className = 'bird fly';
+            b.style.top = (8 + Math.random() * 14) + '%';
+            slot.appendChild(b);
+            setTimeout(() => b.remove(), 14200);
+        }
+        function scheduleBirds() {
+            flyBird();
+            setTimeout(scheduleBirds, 45000 + Math.random() * 45000);
+        }
 
         let timeMode = 'auto', weather = 'auto', raining = false;
         try { timeMode = localStorage.getItem('gt-farm-time') || 'auto'; } catch (e) {}
@@ -257,9 +290,13 @@
             reflect(); window.Sound.chime();
         });
 
-        buildStars(); buildRain(); buildFireflies(); buildTufts(); render(); reflect(); applyTime();
-        setInterval(weatherTick, 20000);
-        setInterval(applyTime, 60000);
+        buildStars(); buildRain(); buildFireflies(); buildTufts(); buildButterflies(); render(); reflect(); applyTime();
+        scheduleBirds();
+        setInterval(() => { if (!document.hidden) weatherTick(); }, 20000);
+        setInterval(() => { if (!document.hidden) applyTime(); }, 60000);
+        document.addEventListener('visibilitychange', () => {
+            document.getElementById('farm').classList.toggle('tab-hidden', document.hidden);
+        });
     </script>
 </body>
 </html>

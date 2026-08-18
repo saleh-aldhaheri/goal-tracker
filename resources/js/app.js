@@ -195,6 +195,12 @@ window.Sound = (() => {
     focus: { chords: [[293.7, 369.9, 440], [261.6, 329.6, 392], [329.6, 415.3, 493.9], [246.9, 311.1, 369.9]], tempo: 4400, wave: 'triangle', arp: 1 },
     rainy: { chords: [[220, 261.6, 311.1], [174.6, 220, 261.6], [196, 246.9, 293.7], [174.6, 220, 261.6]], tempo: 5600, wave: 'sine', pluck: 1 },
     night: { chords: [[130.8, 196, 246.9], [110, 164.8, 196], [123.5, 174.6, 220], [98, 146.8, 196]], tempo: 7200, wave: 'sine' },
+    // Quiet, low-register, deliberately sparse presets for deep work —
+    // slower tempo and a lower gain than the others so they sit further
+    // back and don't compete with thinking.
+    deepfocus: { chords: [[196, 246.9, 293.7], [174.6, 220, 261.6], [164.8, 207.7, 246.9], [174.6, 220, 261.6]], tempo: 8000, wave: 'sine', gain: 0.6 },
+    lofi: { chords: [[220, 277.2, 329.6], [196, 246.9, 293.7], [174.6, 220, 261.6], [196, 246.9, 293.7]], tempo: 5000, wave: 'triangle', arp: 1, gain: 0.65 },
+    minimal: { chords: [[130.8, 196], [116.5, 174.6], [130.8, 196], [98, 146.8]], tempo: 9000, wave: 'sine', gain: 0.55 },
   };
   function ensureMusicGain() { if (!musicGain) { musicGain = ac().createGain(); musicGain.gain.value = state.musicVol; musicGain.connect(ac().destination); } }
   function mNote(freq, vol, type, dur, delay, detune) {
@@ -208,12 +214,18 @@ window.Sound = (() => {
     stopMusic(); const song = SONGS[key]; if (!song) return; state.song = key; save(); ensureMusicGain();
     let i = 0;
     function step() {
+      // Nodes scheduled by the previous step have already finished playing
+      // by the time this fires (their stop time <= tempo ms out), so it's
+      // safe to drop the old references here rather than let the array
+      // grow unbounded for the lifetime of a play session.
+      musicNodes = [];
       const ch = song.chords[i % song.chords.length]; i++;
       const dur = song.tempo / 1000;
-      ch.forEach(f => { mNote(f, 0.055, song.wave, dur, 0); mNote(f * 2, 0.028, song.wave, dur, 0, 5); });
-      mNote(ch[0] / 2, 0.07, 'sine', dur, 0);
-      if (song.arp) { const mel = [ch[0] * 2, ch[1] * 2, ch[2] * 2, ch[1] * 2]; mel.forEach((m, k) => mNote(m, 0.04, 'triangle', 0.5, k * (dur / 4))); }
-      if (song.pluck) { const mel = [ch[2] * 2, ch[1] * 2, ch[0] * 2]; mel.forEach((m, k) => mNote(m, 0.05, 'square', 0.4, k * 0.65)); }
+      const gain = song.gain || 1;
+      ch.forEach(f => { mNote(f, 0.055 * gain, song.wave, dur, 0); mNote(f * 2, 0.028 * gain, song.wave, dur, 0, 5); });
+      mNote(ch[0] / 2, 0.07 * gain, 'sine', dur, 0);
+      if (song.arp) { const mel = [ch[0] * 2, ch[1] * 2, ch[2] * 2, ch[1] * 2]; mel.forEach((m, k) => mNote(m, 0.04 * gain, 'triangle', 0.5, k * (dur / 4))); }
+      if (song.pluck) { const mel = [ch[2] * 2, ch[1] * 2, ch[0] * 2]; mel.forEach((m, k) => mNote(m, 0.05 * gain, 'square', 0.4, k * 0.65)); }
       musicTimer = setTimeout(step, song.tempo);
     }
     step();
